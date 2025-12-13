@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:elevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvMenuItemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pizza"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvMenuItemPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$12.50"
+            android:textColor="@android:color/holo_green_dark" />
+
+        <TextView
+            android:id="@+id/tvMenuItemDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description..."
+            android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:backgroundTint="@android:color/holo_red_light" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_admin"
+    app:startDestination="@id/adminDashboardFragment">
+
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.example.foodnow.ui.admin.AdminDashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_admin_dashboard" />
+
+    <fragment
+        android:id="@+id/adminRestaurantsFragment"
+        android:name="com.example.foodnow.ui.admin.AdminRestaurantsFragment"
+        android:label="Restaurants"
+        tools:layout="@layout/fragment_admin_restaurants">
+        <action
+            android:id="@+id/action_admin_restaurants_to_create"
+            app:destination="@id/createRestaurantFragment" />
+        <action
+            android:id="@+id/action_admin_restaurants_to_orders"
+            app:destination="@id/adminOrdersFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminOrdersFragment"
+        android:name="com.example.foodnow.ui.admin.AdminOrdersFragment"
+        android:label="Restaurant Orders"
+        tools:layout="@layout/fragment_restaurant_orders" />
+
+    <fragment
+        android:id="@+id/createRestaurantFragment"
+        android:name="com.example.foodnow.ui.admin.CreateRestaurantFragment"
+        android:label="New Restaurant"
+        tools:layout="@layout/fragment_create_restaurant" />
+
+    <fragment
+        android:id="@+id/adminLivreursFragment"
+        android:name="com.example.foodnow.ui.admin.AdminLivreursFragment"
+        android:label="Livreurs"
+        tools:layout="@layout/fragment_admin_livreurs">
+        <action
+            android:id="@+id/action_admin_livreurs_to_create"
+            app:destination="@id/createLivreurFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createLivreurFragment"
+        android:name="com.example.foodnow.ui.admin.CreateLivreurFragment"
+        android:label="New Livreur"
+        tools:layout="@layout/fragment_create_livreur" />
+</navigation>

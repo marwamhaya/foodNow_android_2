@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Uber Eats Palette -->
+    <color name="uber_green">#06C167</color> <!-- Keep primary brand color -->
+    <color name="uber_black">#FFFFFF</color> <!-- Inverted for text on dark bg -->
+    <color name="uber_white">#121212</color> <!-- Dark background -->
+    <color name="uber_gray_background">#1E1E1E</color>
+    <color name="uber_text_primary">#FFFFFF</color>
+    <color name="uber_text_secondary">#B0B0B0</color>
+    <color name="uber_divider">#333333</color>
+    
+    <!-- Override default material colors if needed for specific components -->
+    <color name="black">#FFFFFF</color>
+    <color name="white">#000000</color>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FF06C167</color>
+    <color name="purple_500">#FF06C167</color>
+    <color name="purple_700">#FF000000</color>
+    <color name="teal_200">#FF06C167</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Uber Eats Palette -->
+    <color name="uber_green">#06C167</color>
+    <color name="uber_black">#000000</color>
+    <color name="uber_white">#FFFFFF</color>
+    <color name="uber_gray_background">#F6F6F6</color>
+    <color name="uber_text_primary">#000000</color>
+    <color name="uber_text_secondary">#757575</color>
+    <color name="uber_divider">#E0E0E0</color>
+</resources>

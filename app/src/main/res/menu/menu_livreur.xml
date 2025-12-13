@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/livreurDashboardFragment"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="Deliveries" />
+    <item
+        android:id="@+id/livreurHistoryFragment"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="History" />
+    <item
+        android:id="@+id/livreurProfileFragment"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="Profile" />
+</menu>
