@@ -43,7 +43,17 @@ class LivreurProfileFragment : Fragment(R.layout.fragment_livreur_profile) {
                 tvStatus.text = if (profile.isAvailable) "Status: AVAILABLE" else "Status: OFFLINE"
                 btnToggle.text = if (profile.isAvailable) "Go Offline" else "Go Online"
             }
+            result.onFailure {
+                android.widget.Toast.makeText(context, "Failed to load profile: ${it.message}", android.widget.Toast.LENGTH_LONG).show()
+            }
         }
+        
+        viewModel.statusUpdateResult.observe(viewLifecycleOwner) { result ->
+             result.onFailure {
+                 android.widget.Toast.makeText(context, "Failed to toggle status", android.widget.Toast.LENGTH_SHORT).show()
+             }
+        }
+
         viewModel.getProfile()
     }
 }

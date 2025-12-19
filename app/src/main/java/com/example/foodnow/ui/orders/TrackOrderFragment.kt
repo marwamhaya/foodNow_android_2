@@ -12,6 +12,8 @@ import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.coroutineScope
 import com.example.foodnow.FoodNowApp
 import com.example.foodnow.R
 import com.example.foodnow.data.DeliveryResponse
@@ -113,10 +115,8 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
         showConnectionStatus("Connecting...", "#FF9800")
         
         // Get auth token from TokenManager
-        val tokenManager = (requireActivity().application as FoodNowApp).repository.let {
-            // Access tokenManager through FoodNowApp
-            com.example.foodnow.data.TokenManager(requireContext())
-        }
+        val ctx = context ?: return
+        val tokenManager = com.example.foodnow.data.TokenManager(ctx)
         val token = tokenManager.getToken()
         
         if (token.isNullOrEmpty()) {
@@ -126,7 +126,7 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
             return
         }
         
-        val url = "ws://100.79.107.106:8080/ws-foodnow/websocket"
+        val url = "ws://192.168.1.6:8080/ws-foodnow/websocket"
         
         // Create OkHttpClient with auth headers
         val client = okhttp3.OkHttpClient.Builder()
@@ -144,7 +144,7 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
         stompClient?.lifecycle()?.subscribe({ lifecycleEvent ->
             when (lifecycleEvent.type) {
                 LifecycleEvent.Type.OPENED -> {
-                    requireActivity().runOnUiThread { 
+                    activity?.runOnUiThread { 
                         showConnectionStatus("Connected", "#4CAF50")
                         reconnectAttempts = 0
                         
@@ -159,14 +159,14 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
                 }
                 LifecycleEvent.Type.ERROR -> {
                     Log.e(TAG, "WebSocket error", lifecycleEvent.exception)
-                    requireActivity().runOnUiThread { 
+                    activity?.runOnUiThread { 
                         showConnectionStatus("Connection Error", "#F44336")
                         handleConnectionLoss()
                     }
                 }
                 LifecycleEvent.Type.CLOSED -> {
                     Log.d(TAG, "WebSocket closed")
-                    requireActivity().runOnUiThread { 
+                    activity?.runOnUiThread { 
                         showConnectionStatus("Disconnected", "#F44336")
                         handleConnectionLoss()
                     }
@@ -199,8 +199,16 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
         // Subscribe to status updates
         stompClient?.topic("/topic/delivery/$orderId/status")?.subscribe({ topicMessage ->
              requireActivity().runOnUiThread {
-                 updateDeliveryTimeline(topicMessage.payload)
-                 Log.d(TAG, "Status update: ${topicMessage.payload}")
+                 try {
+                     // Payload is a JSON object (DeliveryResponse), not just a string
+                     val deliveryResponse = gson.fromJson(topicMessage.payload, DeliveryResponse::class.java)
+                     updateDeliveryTimeline(deliveryResponse.status)
+                     Log.d(TAG, "Status update: ${deliveryResponse.status}")
+                 } catch (e: Exception) {
+                     // Fallback: in case it IS just a string (backward compatibility)
+                     updateDeliveryTimeline(topicMessage.payload)
+                     Log.e(TAG, "Error parsing status update", e)
+                 }
              }
         }, { error ->
             Log.e(TAG, "Status subscription error", error)
@@ -258,20 +266,68 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
     }
     
     private fun fetchDeliveryDetails(orderId: Long) {
-        viewModel.getAssignedDeliveries()
-        viewModel.deliveries.observe(viewLifecycleOwner) { result ->
-            result.onSuccess { deliveries ->
-                val delivery = deliveries.find { it.orderId == orderId }
-                delivery?.let {
-                    addClientMarker(it.clientAddress)
-                    tvDriverInfo.text = "Delivery to: ${it.clientName}\n${it.clientAddress}"
-                    updateDeliveryTimeline(it.status)
+        // Use LifecycleScope to fetch Client orders directly
+        // Use LifecycleScope to fetch Client orders directly
+        viewLifecycleOwner.lifecycle.coroutineScope.launch {
+            try {
+                val repository = (requireActivity().application as FoodNowApp).repository
+                
+                // 1. Get fundamental order details (address, status)
+                val response = repository.getMyOrders()
+                if (response.isSuccessful && response.body() != null) {
+                    val orders = response.body()!!
+                    val order = orders.find { it.id == orderId }
+                    
+                    if (order != null) {
+                        val address = order.deliveryAddress ?: "Unknown Address"
+                        tvDriverInfo.text = "Delivery to: Me\n$address"
+                        updateDeliveryTimeline(order.status)
+                        
+                        // 2. Try to get precise GPS location
+                        try {
+                            val locResponse = repository.getOrderLocation(orderId)
+                            if (locResponse.isSuccessful && locResponse.body() != null) {
+                                val loc = locResponse.body()!!
+                                val geoPoint = GeoPoint(loc.clientLatitude, loc.clientLongitude)
+                                clientLocation = geoPoint
+                                addClientMarkerAt(geoPoint, address)
+                                Log.d(TAG, "Using stored GPS location: ${loc.clientLatitude}, ${loc.clientLongitude}")
+                            } else {
+                                // Fallback to geocoding
+                                Log.w(TAG, "No stored GPS found, using geocoding")
+                                geocodeAndAddMarker(address)
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error fetching location, falling back to geocoding", e)
+                            geocodeAndAddMarker(address)
+                        }
+                    } else {
+                        Toast.makeText(context, "Order not found", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                     Log.e(TAG, "Failed to fetch orders: ${response.code()}")
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching order details", e)
             }
         }
     }
     
-    private fun addClientMarker(address: String) {
+    private fun addClientMarkerAt(geoPoint: GeoPoint, address: String) {
+        clientMarker = Marker(mapView)
+        clientMarker?.position = geoPoint
+        clientMarker?.title = "Delivery Location"
+        clientMarker?.snippet = address
+        clientMarker?.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        clientMarker?.icon = resources.getDrawable(android.R.drawable.ic_dialog_map, null)
+        mapView.overlays.add(clientMarker)
+        
+        // Center on client location initially
+        mapView.controller.setCenter(geoPoint)
+        mapView.invalidate()
+    }
+
+    private fun geocodeAndAddMarker(address: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 Log.d(TAG, "Geocoding client address: $address")
@@ -281,32 +337,16 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
                     withContext(Dispatchers.Main) {
                         val geoPoint = GeoPoint(location.latitude, location.longitude)
                         clientLocation = geoPoint
-                        
-                        clientMarker = Marker(mapView)
-                        clientMarker?.position = geoPoint
-                        clientMarker?.title = "Delivery Location"
-                        clientMarker?.snippet = address
-                        clientMarker?.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        clientMarker?.icon = resources.getDrawable(android.R.drawable.ic_dialog_map, null)
-                        mapView.overlays.add(clientMarker)
-                        
-                        // Center on client location initially
-                        mapView.controller.setCenter(geoPoint)
-                        mapView.invalidate()
-                        
-                        Log.d(TAG, "Client marker added at: ${location.latitude}, ${location.longitude}")
+                        addClientMarkerAt(geoPoint, address)
+                        Log.d(TAG, "Client marker added via geocoding")
                     }
                 } else {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Unable to locate delivery address", Toast.LENGTH_LONG).show()
-                        Log.w(TAG, "Geocoding returned null for: $address")
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Geocoding failed for: $address", e)
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Error locating address", Toast.LENGTH_SHORT).show()
-                }
+                Log.e(TAG, "Geocoding failed", e)
             }
         }
     }

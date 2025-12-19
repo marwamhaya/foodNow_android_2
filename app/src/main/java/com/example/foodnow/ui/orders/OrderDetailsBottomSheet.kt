@@ -66,6 +66,21 @@ class OrderDetailsBottomSheet(private val order: Order) : BottomSheetDialogFragm
         } else {
              binding.btnTrackOrder.visibility = View.GONE
         }
+
+        // Handle Rate Button visibility
+        if (order.status == "DELIVERED") {
+            binding.btnRateOrder.visibility = View.VISIBLE
+            binding.btnRateOrder.setOnClickListener {
+                val ratingBottomSheet = RatingBottomSheetFragment().apply {
+                    arguments = Bundle().apply {
+                        putLong("orderId", order.id)
+                    }
+                }
+                ratingBottomSheet.show(parentFragmentManager, "RatingBottomSheet")
+            }
+        } else {
+            binding.btnRateOrder.visibility = View.GONE
+        }
         
         binding.btnClose.setOnClickListener { dismiss() }
     }

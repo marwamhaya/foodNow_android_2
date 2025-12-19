@@ -37,9 +37,7 @@ class LivreurHistoryFragment : Fragment(R.layout.fragment_livreur_dashboard) { /
             }
         }
 
-        // Call history method (need to adding ViewModel method if missing, I added getAssignedDeliveries, need getDeliveryHistory)
-        // I added getDeliveryHistory in ApiService/Repo but did I add it to ViewModel? 
-        // Checking ViewModel... I only added getAssignedDeliveries and updateStatus and getProfile.
-        // Needs `getHistory()`
+        // Call history method
+        viewModel.getDeliveryHistory()
     }
 }

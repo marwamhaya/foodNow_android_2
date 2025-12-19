@@ -11,7 +11,7 @@ import retrofit2.http.DELETE
 interface ApiService {
 
     @POST("/api/auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
+    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>//suspend means This might take time, so don’t freeze the app
 
     @POST("/api/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
@@ -100,9 +100,18 @@ interface ApiService {
     @retrofit2.http.PATCH("/api/driver-locations")
     suspend fun updateLocation(@Body location: LocationUpdateDto): Response<Void>
 
+    @POST("/api/ratings")
+    suspend fun submitRating(@Body request: RatingRequest): Response<Void>
+
     // GPS Location Tracking
     @POST("/api/orders/{orderId}/location")
     suspend fun saveOrderLocation(
+        @Path("orderId") orderId: Long,
+        @Body location: LocationUpdateDto
+    ): Response<Void>
+
+    @retrofit2.http.PATCH("/api/orders/{orderId}/driver-location")
+    suspend fun saveDriverLocation(
         @Path("orderId") orderId: Long,
         @Body location: LocationUpdateDto
     ): Response<Void>

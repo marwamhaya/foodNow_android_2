@@ -41,6 +41,25 @@
             android:text="To: Client Name\nAddr: 456 Avenue"
             android:layout_marginTop="8dp" />
 
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvRatingComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="italic"
+            android:textColor="#555555"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"/>
+
         <Button
             android:id="@+id/btnAction"
             android:layout_width="match_parent"

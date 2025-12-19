@@ -126,6 +126,7 @@ data class Order(
     val restaurantName: String, // Assuming backend projection or fetch
     val status: String,
     val totalAmount: BigDecimal,
+    val deliveryAddress: String?,
     val createdAt: String,
     @SerializedName("orderItems")
     val items: List<OrderItem> = emptyList()
@@ -142,7 +143,9 @@ data class DeliveryResponse(
     val status: String,
     val pickupTime: String?,
     val deliveryTime: String?,
-    val createdAt: String
+    val createdAt: String,
+    val rating: Int?,
+    val ratingComment: String?
 )
 
 data class LivreurResponse(
@@ -155,7 +158,9 @@ data class LivreurResponse(
     val isAvailable: Boolean,
     val isActive: Boolean,
     val latitude: Double?,
-    val longitude: Double?
+    val longitude: Double?,
+    val averageRating: Double?,
+    val completedDeliveries: Int?
 )
 
 data class LocationUpdateDto(
@@ -200,6 +205,12 @@ data class OrderItemRequest(
 data class PaymentRequest(
     val amount: BigDecimal,
     val paymentMethod: String
+)
+
+data class RatingRequest(
+    val orderId: Long,
+    val rating: Int,
+    val comment: String
 )
 
 data class PaymentResponse(

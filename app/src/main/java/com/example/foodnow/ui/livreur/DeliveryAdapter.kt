@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.foodnow.R
 import com.example.foodnow.data.DeliveryResponse
 
+import android.widget.RatingBar
+
 class DeliveryAdapter(
     private var deliveries: List<DeliveryResponse>,
     private val onActionClick: (DeliveryResponse) -> Unit
@@ -20,6 +22,8 @@ class DeliveryAdapter(
         val tvResto: TextView = itemView.findViewById(R.id.tvRestaurantInfo)
         val tvClient: TextView = itemView.findViewById(R.id.tvClientInfo)
         val btnAction: Button = itemView.findViewById(R.id.btnAction)
+        val ratingBar: RatingBar = itemView.findViewById(R.id.ratingBar)
+        val tvComment: TextView = itemView.findViewById(R.id.tvRatingComment)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeliveryViewHolder {
@@ -38,35 +42,58 @@ class DeliveryAdapter(
             "PENDING" -> {
                 holder.btnAction.text = "Accept"
                 holder.btnAction.visibility = View.VISIBLE
+                hideRating(holder)
             }
             "DELIVERY_ACCEPTED" -> {
                 holder.btnAction.text = "Pick Up"
                 holder.btnAction.visibility = View.VISIBLE
-                
-                // Also could open map here to navigate to restaurant
-                holder.itemView.setOnClickListener { onActionClick(item) } 
+                holder.itemView.setOnClickListener { onActionClick(item) }
+                hideRating(holder)
             }
             "PICKED_UP" -> { 
                 holder.btnAction.text = "Open Active Map"
                 holder.btnAction.visibility = View.VISIBLE
+                hideRating(holder)
             }
             "READY_FOR_PICKUP" -> {
                 holder.btnAction.text = "Pick Up"
                 holder.btnAction.visibility = View.VISIBLE
+                hideRating(holder)
             }
             "IN_DELIVERY", "ON_THE_WAY" -> {
                 holder.btnAction.text = "Open Active Map"
                 holder.btnAction.visibility = View.VISIBLE
+                hideRating(holder)
             }
             "DELIVERED" -> {
                 holder.btnAction.visibility = View.GONE
+                
+                if (item.rating != null && item.rating > 0) {
+                    holder.ratingBar.visibility = View.VISIBLE
+                    holder.ratingBar.rating = item.rating.toFloat()
+                    
+                    if (!item.ratingComment.isNullOrEmpty()) {
+                        holder.tvComment.visibility = View.VISIBLE
+                        holder.tvComment.text = "\"${item.ratingComment}\""
+                    } else {
+                        holder.tvComment.visibility = View.GONE
+                    }
+                } else {
+                     hideRating(holder)
+                }
             }
             else -> {
                 holder.btnAction.visibility = View.GONE
+                hideRating(holder)
             }
         }
 
         holder.btnAction.setOnClickListener { onActionClick(item) }
+    }
+    
+    private fun hideRating(holder: DeliveryViewHolder) {
+        holder.ratingBar.visibility = View.GONE
+        holder.tvComment.visibility = View.GONE
     }
 
     override fun getItemCount() = deliveries.size

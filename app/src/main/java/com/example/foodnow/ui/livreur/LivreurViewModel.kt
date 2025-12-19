@@ -32,6 +32,9 @@ class LivreurViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
+    private val _statusUpdateResult = MutableLiveData<Result<Boolean>>()
+    val statusUpdateResult: LiveData<Result<Boolean>> = _statusUpdateResult
+
     fun updateStatus(deliveryId: Long, status: String) {
         viewModelScope.launch {
             try {
@@ -40,9 +43,12 @@ class LivreurViewModel(private val repository: Repository) : ViewModel() {
                 val response = repository.updateDeliveryStatus(deliveryId, status)
                 if (response.isSuccessful) {
                     getAssignedDeliveries() // Refresh
+                    _statusUpdateResult.value = Result.success(true)
+                } else {
+                    _statusUpdateResult.value = Result.failure(Exception("Failed to update status: ${response.code()}"))
                 }
             } catch (e: Exception) {
-                // handle error
+                _statusUpdateResult.value = Result.failure(e)
             }
         }
     }
@@ -62,8 +68,16 @@ class LivreurViewModel(private val repository: Repository) : ViewModel() {
     
     fun toggleAvailability() {
          viewModelScope.launch {
-             repository.toggleAvailability()
-             getProfile()
+             try {
+                 val response = repository.toggleAvailability()
+                 if (response.isSuccessful) {
+                     getProfile()
+                 } else {
+                     _statusUpdateResult.value = Result.failure(Exception("Error toggling: ${response.code()}"))
+                 }
+             } catch (e: Exception) {
+                 _statusUpdateResult.value = Result.failure(e)
+             }
          }
     }
 

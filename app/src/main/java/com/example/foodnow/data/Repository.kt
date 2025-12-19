@@ -7,26 +7,34 @@ import retrofit2.Response
 import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
 
-object RetrofitClient {
-    private const val BASE_URL = "http://100.79.107.106:8080/" // Physical device - Computer's local IP
+object RetrofitClient {//one instance exists in the app(singleton)
+    private const val BASE_URL = "http://192.168.1.6:8080/" // Physical device Computer's local IP can only be accessed inside RetrofitClient
 
     fun getInstance(tokenManager: TokenManager): ApiService {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
-        }
+        }/*This is an OkHttp Interceptor configured for debugging.
+        I set the logging level to BODY so that during development,
+        I can see the full raw data being sent to and received from the server in the Logcat (the console).
+        It’s essential for troubleshooting API calls to ensure the data format is correct.*/
         
         val client = OkHttpClient.Builder()
             .addInterceptor(logging)
             .addInterceptor(AuthInterceptor(tokenManager))
             .build()
-
+        /*I use an OkHttp Interceptor chain.
+        I built a custom AuthInterceptor that automatically injects the user's authentication token into the header of every outgoing request.
+        This keeps the code clean because I don't have to manually add the token every time I want to fetch data.*/
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
             .create(ApiService::class.java)
-    }
+    }/*I used Retrofit as my Type-Safe HTTP client. It's configured with a Base URL and uses Gson as a converter
+    factory to automatically handle JSON serialization and deserialization.
+    I also attached a custom OkHttpClient to handle logging and authentication, and finally,
+    I used the Create method to turn my API interface into a live service*/
 }
 
 class Repository(private val apiService: ApiService, private val tokenManager: TokenManager) {
@@ -100,6 +108,12 @@ class Repository(private val apiService: ApiService, private val tokenManager: T
     suspend fun getOrderLocation(orderId: Long) = apiService.getOrderLocation(orderId)
     suspend fun saveOrderLocation(orderId: Long, location: LocationUpdateDto) = 
         apiService.saveOrderLocation(orderId, location)
+
+    suspend fun saveDriverLocation(orderId: Long, location: LocationUpdateDto) = 
+        apiService.saveDriverLocation(orderId, location)
+
+    suspend fun submitRating(orderId: Long, rating: Int, comment: String) = 
+        apiService.submitRating(RatingRequest(orderId, rating, comment))
 
     suspend fun uploadRestaurantImage(id: Long, image: okhttp3.MultipartBody.Part) = apiService.uploadRestaurantImage(id, image)
     suspend fun uploadMenuItemImage(id: Long, image: okhttp3.MultipartBody.Part) = apiService.uploadMenuItemImage(id, image)

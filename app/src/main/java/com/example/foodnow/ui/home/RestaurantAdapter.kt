@@ -33,7 +33,7 @@ class RestaurantAdapter(
         
         if (!restaurant.imageUrl.isNullOrEmpty()) {
             val fullUrl = if (restaurant.imageUrl.startsWith("http")) restaurant.imageUrl 
-                           else "http://100.79.107.106:8080${restaurant.imageUrl}"
+                           else "http://192.168.1.6:8080${restaurant.imageUrl}"
             Glide.with(holder.itemView.context)
                 .load(fullUrl)
                 .placeholder(android.R.drawable.ic_menu_gallery)
