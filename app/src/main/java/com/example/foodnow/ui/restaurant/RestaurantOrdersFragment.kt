@@ -13,9 +13,11 @@ import com.example.foodnow.ui.ViewModelFactory
 
 import androidx.navigation.fragment.findNavController
 
+import androidx.fragment.app.activityViewModels
+
 class RestaurantOrdersFragment : Fragment(R.layout.fragment_restaurant_orders) {
 
-    private val viewModel: RestaurantViewModel by viewModels {
+    private val viewModel: RestaurantViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as FoodNowApp).repository)
     }
     private lateinit var adapter: RestaurantOrderAdapter
@@ -30,37 +32,28 @@ class RestaurantOrdersFragment : Fragment(R.layout.fragment_restaurant_orders) {
 
         val tvEmpty = view.findViewById<android.widget.TextView>(R.id.tvEmptyOrders)
         
-        adapter = RestaurantOrderAdapter(emptyList(), 
+        adapter = RestaurantOrderAdapter(
+            emptyList(), 
             onAction1Click = { order ->
                 android.util.Log.d("RestaurantOrders", "Action 1 clicked for order ${order.id} with status ${order.status}")
-                val context = requireContext() // Ensure context is safe
-                // Toast.makeText(context, "Clicked Accept/Action1: ${order.status}", Toast.LENGTH_SHORT).show() 
                 when (order.status) {
-                    "PENDING" -> {
-                        android.util.Log.d("RestaurantOrders", "Calling acceptOrder")
-                        viewModel.acceptOrder(order.id)
-                    }
-                    "ACCEPTED" -> {
-                        android.util.Log.d("RestaurantOrders", "Calling prepareOrder")
-                        viewModel.prepareOrder(order.id)
-                    }
-                    "PREPARING" -> {
-                        android.util.Log.d("RestaurantOrders", "Calling readyOrder")
-                        viewModel.readyOrder(order.id)
-                    }
-                    else -> {
-                        android.util.Log.d("RestaurantOrders", "Unknown status for action 1: ${order.status}")
-                    }
+                    "PENDING" -> viewModel.acceptOrder(order.id)
+                    "ACCEPTED" -> viewModel.prepareOrder(order.id)
+                    "PREPARING" -> viewModel.readyOrder(order.id)
                 }
             },
             onAction2Click = { order ->
                 android.util.Log.d("RestaurantOrders", "Action 2 clicked for order ${order.id}")
                 viewModel.rejectOrder(order.id, "Declined by restaurant")
+            },
+            onItemClick = { order ->
+                // Navigate to order details
+                val bundle = Bundle().apply {
+                    putLong("orderId", order.id)
+                }
+                findNavController().navigate(R.id.action_orders_to_details, bundle)
             }
         )
-        // Oops, I can't modify adapter callback behavior without changing adapter.
-        // Let's stick to existing logic for buttons, but how to see details?
-        // I'll modify Adapter to add `onItemClick`.
         
         recyclerView.adapter = adapter
         
@@ -97,16 +90,34 @@ class RestaurantOrdersFragment : Fragment(R.layout.fragment_restaurant_orders) {
         val filtered = when (tabIndex) {
             0 -> allOrders // All
             1 -> allOrders.filter { it.status == "PENDING" } // Pending
-            2 -> allOrders.filter { it.status == "ACCEPTED" || it.status == "PREPARING" } // In Progress
-            3 -> allOrders.filter { it.status == "READY" } // Ready
+            2 -> allOrders.filter { it.status == "ACCEPTED" || it.status == "PREPARING" || it.status == "IN_DELIVERY" } // In Progress
+            3 -> allOrders.filter { it.status == "READY_FOR_PICKUP" } // Ready
+            4 -> allOrders.filter { it.status == "DELIVERED" } // Delivered
+            5 -> allOrders.filter { it.status == "CANCELLED" || it.status == "DECLINED" } // Cancelled
             else -> allOrders
         }
         
-        adapter.updateOrders(filtered)
+        // Sort: oldest first, non-completed orders first
+        val sorted = filtered.sortedWith(
+            compareBy<com.example.foodnow.data.Order> { 
+                when (it.status) {
+                    "PENDING" -> 0
+                    "ACCEPTED" -> 1
+                    "PREPARING" -> 2
+                    "READY_FOR_PICKUP" -> 3
+                    "IN_DELIVERY" -> 4
+                    "DELIVERED" -> 5
+                    "CANCELLED", "DECLINED" -> 6
+                    else -> 7
+                }
+            }.thenBy { it.createdAt } // Oldest first within same priority
+        )
+        
+        adapter.updateOrders(sorted)
         val tvEmpty = view?.findViewById<android.widget.TextView>(R.id.tvEmptyOrders)
         val recyclerView = view?.findViewById<RecyclerView>(R.id.rvRestaurantOrders)
         
-        if (filtered.isEmpty()) {
+        if (sorted.isEmpty()) {
             tvEmpty?.visibility = View.VISIBLE
             recyclerView?.visibility = View.GONE
         } else {

@@ -41,6 +41,30 @@
                     android:layout_height="wrap_content"
                     android:text="Date: -"
                     android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvClientName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Client: -"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvClientPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phone: -"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvDeliveryAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delivery: -"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="12dp"/>
                 

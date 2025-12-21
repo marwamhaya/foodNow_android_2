@@ -164,4 +164,76 @@ class LocationService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    companion object {
+        suspend fun getCurrentLocation(context: Context): Location? = kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            
+            // Check permissions
+            if (androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) 
+                != PackageManager.PERMISSION_GRANTED) {
+                if (cont.isActive) cont.resume(null, null)
+                return@suspendCancellableCoroutine
+            }
+
+            // Try last known first
+            val lastKnownGps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val lastKnownNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            var bestLocation = lastKnownGps
+            
+            if (lastKnownNet != null) {
+                if (bestLocation == null || lastKnownNet.time > bestLocation.time) {
+                    bestLocation = lastKnownNet
+                }
+            }
+            
+            // If we have a recent location (e.g. within 5 mins), return it immediately
+            if (bestLocation != null && System.currentTimeMillis() - bestLocation.time < 5 * 60 * 1000) {
+                 if (cont.isActive) cont.resume(bestLocation, null)
+                 return@suspendCancellableCoroutine
+            }
+
+            val listener = object : LocationListener {
+                override fun onLocationChanged(location: Location) {
+                    if (cont.isActive) {
+                        cont.resume(location, null)
+                        locationManager.removeUpdates(this)
+                    }
+                }
+                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+                override fun onProviderEnabled(provider: String) {}
+                override fun onProviderDisabled(provider: String) {
+                    if (cont.isActive) {
+                         // If one provider is disabled, we might still wait for another? 
+                         // But for simplicity, if we rely on this provider and it dies, we might fail or wait for timeout.
+                         // We won't resume null immediately here to allow race with other provider or timeout.
+                    }
+                }
+            }
+
+            try {
+                var requestStarted = false
+                // Request updates from both if enabled
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, listener, android.os.Looper.getMainLooper())
+                     requestStarted = true
+                }
+                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, listener, android.os.Looper.getMainLooper())
+                     requestStarted = true
+                }
+                
+                if (!requestStarted) {
+                     if (cont.isActive) cont.resume(null, null)
+                }
+                
+                cont.invokeOnCancellation {
+                    locationManager.removeUpdates(listener)
+                }
+            } catch (e: Exception) {
+                if (cont.isActive) cont.resume(null, null)
+                android.util.Log.e("LocationService", "Error requesting location", e)
+            }
+        }
+    }
 }

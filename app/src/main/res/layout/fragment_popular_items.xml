@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Popular Items"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:padding="16dp" 
+        android:elevation="4dp"
+        android:background="@color/white"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        android:scrollbars="none">
+        
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+            <!-- Chips will be added dynamically or hardcoded if known -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                tools:checked="true"/>
+             <com.google.android.material.chip.Chip
+                android:id="@+id/chipBurger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Burger"
+                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+             <com.google.android.material.chip.Chip
+                android:id="@+id/chipPizza"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pizza"
+                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+             <com.google.android.material.chip.Chip
+                android:id="@+id/chipDrink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Drink"
+                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <!-- Grid RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:padding="16dp" />
+
+</LinearLayout>

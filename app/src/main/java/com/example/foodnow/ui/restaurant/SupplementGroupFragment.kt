@@ -7,7 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodnow.FoodNowApp
@@ -19,7 +19,7 @@ import java.math.BigDecimal
 
 class SupplementGroupFragment : Fragment(R.layout.fragment_supplement_group) {
 
-    private val viewModel: RestaurantViewModel by viewModels {
+    private val viewModel: RestaurantViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as FoodNowApp).repository)
     }
     
@@ -44,8 +44,8 @@ class SupplementGroupFragment : Fragment(R.layout.fragment_supplement_group) {
         adapter = OptionsAdapter()
         rvOptions.adapter = adapter
         
-        // Observe selectedMenuItem
-        viewModel.selectedMenuItem.observe(viewLifecycleOwner) { item ->
+        // Observe draftMenuItem
+        viewModel.draftMenuItem.observe(viewLifecycleOwner) { item ->
             if (item == null) return@observe
             val group = item.optionGroups.find { it.id == groupId }
             if (group != null) {
@@ -82,22 +82,8 @@ class SupplementGroupFragment : Fragment(R.layout.fragment_supplement_group) {
     }
     
     private fun addOption(name: String, price: BigDecimal) {
-        val currentItem = viewModel.selectedMenuItem.value ?: return
-        val groups = currentItem.optionGroups.toMutableList()
-        val groupIndex = groups.indexOfFirst { it.id == groupId }
-        if (groupIndex != -1) {
-            val group = groups[groupIndex]
-            val newOptions = group.options.toMutableList()
-            // ID generation? Backend usually handles ID.
-            // If local update, use temp negative ID?
-            val newId = System.currentTimeMillis() // Temp ID
-            newOptions.add(MenuOptionResponse(newId, name, price))
-            
-            val newGroup = group.copy(options = newOptions)
-            groups[groupIndex] = newGroup
-            
-            val newItem = currentItem.copy(optionGroups = groups)
-            viewModel.updateMenuItemLocal(newItem)
-        }
+        val newId = System.currentTimeMillis() // Temp ID
+        val option = MenuOptionResponse(newId, name, price)
+        viewModel.addOptionToDraftGroup(groupId, option)
     }
 }

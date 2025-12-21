@@ -20,6 +20,10 @@
         android:name="com.example.foodnow.ui.restaurant.RestaurantOrdersFragment"
         android:label="Orders"
         tools:layout="@layout/fragment_restaurant_orders">
+        <argument
+            android:name="filterTab"
+            app:argType="integer"
+            android:defaultValue="0" />
         <action
             android:id="@+id/action_orders_to_details"
             app:destination="@id/orderDetailsFragment" />
@@ -46,6 +50,9 @@
         <action
             android:id="@+id/action_menu_to_details"
             app:destination="@id/menuItemDetailsFragment" />
+        <action
+            android:id="@+id/action_menu_to_ratings"
+            app:destination="@id/restaurantRatingsFragment" />
     </fragment>
 
     <fragment
@@ -113,6 +120,12 @@
         android:name="com.example.foodnow.ui.restaurant.ChangePasswordFragment"
         android:label="Change Password"
         tools:layout="@layout/fragment_change_password" />
+
+    <fragment
+        android:id="@+id/restaurantRatingsFragment"
+        android:name="com.example.foodnow.ui.restaurant.RestaurantRatingsFragment"
+        android:label="My Ratings"
+        tools:layout="@layout/fragment_restaurant_ratings" />
         
     <!-- Action from Dashboard to Profile -->
     <!-- Ideally dashboard has a menu or button to go to profile -->

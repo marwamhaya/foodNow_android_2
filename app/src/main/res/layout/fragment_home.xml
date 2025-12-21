@@ -1,75 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/uber_white"
-    android:padding="16dp">
+    android:fillViewport="true"
+    android:background="@color/background">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restaurants"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="start"
-        android:layout_marginBottom="16dp"
-        android:textColor="@color/uber_black" />
+        android:orientation="vertical"
+        android:paddingBottom="80dp">
 
-
-    <!-- Filters Mock Removed -->
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vpPromoCarousel"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="240dp"
             android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp" />
+            android:clipChildren="false" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tvError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Error loading restaurants"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/layoutCart"
+        <!-- Section Header -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tlPromoIndicator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical"
-            android:background="@color/uber_white"
-            android:elevation="8dp"
-            android:padding="16dp"
-            android:visibility="gone">
+            android:layout_marginTop="1dp"
+            android:background="@android:color/transparent"
+            app:tabBackground="@drawable/bg_dot_selector"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp"
+            app:tabRippleColor="@null" />
 
-            <Button
-                android:id="@+id/btnPlaceOrder"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Famous Restaurants"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"/>
+
+            <TextView
+                android:id="@+id/btnSeeAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="See all"
+                android:textSize="14sp"
+                android:textColor="@color/primary"
+                android:background="@drawable/bg_quantity_selector"
+                android:backgroundTint="#FFF0ED"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+
+        <!-- Horizontal List -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="View Cart"
-                android:textAllCaps="false"
-                android:backgroundTint="@color/uber_green"
-                android:textColor="@color/uber_white"
-                android:textSize="18sp"
-                app:cornerRadius="4dp" />
-        </LinearLayout>
-    </FrameLayout>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-</LinearLayout>
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Error loading restaurants"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <!-- Popular Items Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Popular items"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"/>
+
+            <TextView
+                android:id="@+id/btnSeeAllPopular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="See all"
+                android:textSize="14sp"
+                android:textColor="@color/primary"
+                android:background="@drawable/bg_quantity_selector"
+                android:backgroundTint="#FFF0ED"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+
+        <!-- Popular Items List -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPopularItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </FrameLayout>
+        
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

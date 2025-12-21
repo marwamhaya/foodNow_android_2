@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:elevation="4dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/surface"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,29 +17,80 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Header: Order ID + Status Badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvOrderId"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Order #123"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/tvOrderStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PENDING"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:background="@drawable/bg_quantity_selector"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <!-- Client Name -->
         <TextView
-            android:id="@+id/tvOrderId"
+            android:id="@+id/tvClientName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Order #123"
-            android:textStyle="bold"
-            android:textSize="18sp" />
+            android:text="Client: John Doe"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="6dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_myplaces"
+            android:drawableTint="@color/primary" />
 
+        <!-- Date/Time -->
         <TextView
-            android:id="@+id/tvOrderStatus"
+            android:id="@+id/tvOrderDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Status: PENDING"
-            android:textColor="@android:color/holo_orange_dark"
-            android:layout_marginTop="4dp" />
+            android:text="Dec 19 • 14:30"
+            android:textSize="13sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginTop="4dp"
+            android:drawablePadding="6dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_recent_history"
+            android:drawableTint="@color/text_secondary" />
 
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:layout_marginVertical="12dp" />
+
+        <!-- Total Price -->
         <TextView
             android:id="@+id/tvOrderPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total: $25.00"
-            android:layout_marginTop="4dp" />
+            android:text="Total: 125.00 DH"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary" />
 
+        <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,19 +98,24 @@
             android:layout_marginTop="12dp"
             android:gravity="end">
 
-            <Button
-                android:id="@+id/btnAction1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Accept"
-                android:layout_marginEnd="8dp" />
-
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAction2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Reject"
-                android:backgroundTint="@android:color/holo_red_light" />
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:textColor="@android:color/holo_red_dark"
+                app:strokeColor="@android:color/holo_red_light"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAction1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept"
+                style="@style/Widget.Material3.Button"
+                android:backgroundTint="@color/primary" />
         </LinearLayout>
+
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

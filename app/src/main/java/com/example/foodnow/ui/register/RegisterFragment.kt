@@ -26,16 +26,17 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         binding.btnRegister.setOnClickListener {
             val fullName = binding.etFullName.text.toString()
             val email = binding.etEmail.text.toString()
+            val phoneNumber = binding.etPhoneNumber.text.toString()
             val password = binding.etPassword.text.toString()
             val confirmPassword = binding.etConfirmPassword.text.toString()
 
-            if (fullName.isNotBlank() && email.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank()) {
+            if (fullName.isNotBlank() && email.isNotBlank() && phoneNumber.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank()) {
                 if (password.length < 6) {
                     Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
                 } else if (password == confirmPassword) {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnRegister.isEnabled = false
-                    viewModel.register(fullName, email, password)
+                    viewModel.register(fullName, email, password, phoneNumber)
                 } else {
                     Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 }

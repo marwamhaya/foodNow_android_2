@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.foodnow.R
 import com.example.foodnow.data.Order
 import com.example.foodnow.data.OrderItem
 import com.example.foodnow.databinding.BottomSheetOrderDetailsBinding
+import com.example.foodnow.utils.Constants
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.navigation.fragment.findNavController
 import com.example.foodnow.ui.orders.TrackOrderFragment
@@ -28,19 +31,36 @@ class OrderDetailsBottomSheet(private val order: Order) : BottomSheetDialogFragm
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvOrderId.visibility = View.GONE // Hide ID
+        // Close button
+        binding.btnClose.setOnClickListener { dismiss() }
+
+        binding.tvOrderId.visibility = View.GONE
         binding.tvOrderId.text = "Order #${order.id}"
         binding.tvRestaurantName.text = order.restaurantName
+        binding.tvRestaurantCategory.text = "Restaurant" // Placeholder category
         binding.tvOrderDate.text = "Date: ${order.createdAt.take(10)}"
-        binding.tvOrderStatus.text = "Status: ${order.status}"
+        binding.tvOrderStatus.text = order.status.replace("_", " ")
         binding.tvTotal.text = "${String.format("%.2f", order.totalAmount)} DH"
 
-        // Set status color
-        when (order.status) {
-            "DELIVERED" -> binding.tvOrderStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-            "CANCELLED" -> binding.tvOrderStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
-            else -> binding.tvOrderStatus.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
+        // Load restaurant image
+        if (!order.restaurantImageUrl.isNullOrEmpty()) {
+            val fullUrl = Constants.getFullImageUrl(order.restaurantImageUrl)
+            Glide.with(this)
+                .load(fullUrl)
+                .centerCrop()
+                .placeholder(R.drawable.placeholder_food)
+                .into(binding.ivRestaurantImage)
         }
+
+        // Set status color
+        val colorRes = when (order.status) {
+            "DELIVERED" -> R.color.success
+            "CANCELLED", "DECLINED" -> R.color.error
+            else -> R.color.primary // Active/Pending
+        }
+        binding.tvOrderStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            androidx.core.content.ContextCompat.getColor(requireContext(), colorRes)
+        )
 
         // Setup RecyclerView
         val adapter = OrderItemsAdapter(order.items)
@@ -71,24 +91,25 @@ class OrderDetailsBottomSheet(private val order: Order) : BottomSheetDialogFragm
         if (order.status == "DELIVERED") {
             binding.btnRateOrder.visibility = View.VISIBLE
             binding.btnRateOrder.setOnClickListener {
-                val ratingBottomSheet = RatingBottomSheetFragment().apply {
-                    arguments = Bundle().apply {
-                        putLong("orderId", order.id)
-                    }
-                }
+                val ratingBottomSheet = RatingBottomSheetFragment.newInstance(
+                    order.id, 
+                    order.restaurantName,
+                    order.restaurantAddress,
+                    order.restaurantImageUrl
+                )
                 ratingBottomSheet.show(parentFragmentManager, "RatingBottomSheet")
             }
         } else {
             binding.btnRateOrder.visibility = View.GONE
         }
-        
-        binding.btnClose.setOnClickListener { dismiss() }
     }
 }
 
 class OrderItemsAdapter(private val items: List<OrderItem>) : RecyclerView.Adapter<OrderItemsAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val ivItemImage: ImageView = view.findViewById(R.id.ivItemImage)
+        val tvQuantity: TextView = view.findViewById(R.id.tvQuantity)
         val tvItemName: TextView = view.findViewById(R.id.tvItemName)
         val tvItemDetails: TextView = view.findViewById(R.id.tvItemDetails)
         val tvItemPrice: TextView = view.findViewById(R.id.tvItemPrice)
@@ -102,7 +123,20 @@ class OrderItemsAdapter(private val items: List<OrderItem>) : RecyclerView.Adapt
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.tvItemName.text = "${item.quantity}x ${item.menuItemName}"
+        holder.tvQuantity.text = "${item.quantity}x"
+        holder.tvItemName.text = item.menuItemName
+        
+        // Load item image
+        if (!item.menuItemImageUrl.isNullOrEmpty()) {
+            val fullUrl = Constants.getFullImageUrl(item.menuItemImageUrl)
+            Glide.with(holder.itemView.context)
+                .load(fullUrl)
+                .centerCrop()
+                .placeholder(R.drawable.placeholder_food)
+                .into(holder.ivItemImage)
+        } else {
+            holder.ivItemImage.setImageResource(R.drawable.placeholder_food)
+        }
         
         // Show supplements with prices if any
         if (!item.selectedOptions.isNullOrEmpty()) {
@@ -115,22 +149,7 @@ class OrderItemsAdapter(private val items: List<OrderItem>) : RecyclerView.Adapt
             holder.tvItemDetails.visibility = View.GONE
         }
         
-        // Calculate total price for item including supplements
-        // Ideally backend provides this or we act as if price is unit price * qty
-        // But backend subtotal is already calculated. 
-        // Wait, OrderItem in Models.kt has 'price: BigDecimal'. 
-        // In API Service (OrderController) -> OrderService -> mapToOrderItemResponse -> sets 'unitPrice' to OrderItemResponse.unitPrice.
-        // Android OrderItem 'price' maps to JSON 'unitPrice' or 'subtotal'?
-        // Looking at Models.kt: data class OrderItem(..., val price: BigDecimal, ...).
-        // Looking at JSON Mapping, if Gson is used, name must match.
-        // OrderItemResponse has 'unitPrice' and 'subtotal'. Models.kt OrderItem has 'price'.
-        // This is a mismatch unless SerializedName is used.
-        // CartManager uses menuItem.price.
-        // Let's assume 'price' in OrderItem is just the unit price for now or the subtotal?
-        // Let's look at `item_order_detail.xml` view which uses `tvItemPrice`.
-        // The user wants "Total Price of item".
-        // If I use the price from the model, I should multiply by quantity.
-
+        // Calculate total price for item
         val totalPrice = item.price.multiply(java.math.BigDecimal(item.quantity))
         holder.tvItemPrice.text = "${String.format("%.2f", totalPrice)} DH"
     }

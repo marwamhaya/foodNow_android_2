@@ -21,4 +21,28 @@
         android:background="?android:attr/windowBackground"
         app:menu="@menu/bottom_nav_menu" />
 
+    <!-- Global Cart Bar -->
+    <LinearLayout
+        android:id="@+id/layoutGlobalCart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_nav_view"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnGlobalPlaceOrder"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="View Cart"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/primary"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+
 </RelativeLayout>

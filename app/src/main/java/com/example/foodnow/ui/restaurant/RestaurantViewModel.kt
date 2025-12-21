@@ -23,7 +23,16 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
     private val _menuItems = MutableLiveData<Result<List<com.example.foodnow.data.MenuItemResponse>>>()
     val menuItems: LiveData<Result<List<com.example.foodnow.data.MenuItemResponse>>> = _menuItems
 
+    private val _stats = MutableLiveData<Result<com.example.foodnow.data.RestaurantStatsResponse>>()
+    val stats: LiveData<Result<com.example.foodnow.data.RestaurantStatsResponse>> = _stats
+
     var currentRestaurantId: Long? = null
+
+    fun fetchStats() {
+        viewModelScope.launch {
+            _stats.value = repository.getRestaurantStats()
+        }
+    }
     
     // --- Draft State for Menu Item ---
     private val _draftMenuItem = MutableLiveData<MenuItemRequest?>()
@@ -75,6 +84,9 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
     }
 
     fun startEditing(id: Long) {
+        // Reset save status so we don't accidentally triggering success observers from previous runs
+        _saveStatus.value = Result.success(false)
+
         if (_draftId == id && _draftMenuItem.value != null) return // Already editing this item
         
         val item = _menuItems.value?.getOrNull()?.find { it.id == id }
@@ -109,11 +121,6 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
 
     fun setDraftImage(uri: android.net.Uri) {
         _draftImageUri = uri
-        // We do NOT update imageUrl in draftRequest yet, because we don't have a backend URL.
-        // The UI should show this local URI.
-        // We trigger an update just to refresh observers if needed, 
-        // but primarily the Fragment holds the URI too or observes a separate "draftImage" if we made one.
-        // To simplify, let's keep it in Fragment or add a LiveData here.
     }
     
     fun addOptionGroupToDraft(group: com.example.foodnow.data.MenuOptionGroupResponse) {
@@ -121,6 +128,25 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
         val newGroups = current.optionGroups.toMutableList()
         newGroups.add(group)
         _draftMenuItem.value = current.copy(optionGroups = newGroups)
+    }
+
+    fun removeOptionGroupFromDraft(groupId: Long) {
+        val current = _draftMenuItem.value ?: return
+        val newGroups = current.optionGroups.filter { it.id != groupId }
+        _draftMenuItem.value = current.copy(optionGroups = newGroups)
+    }
+
+    fun addOptionToDraftGroup(groupId: Long, option: com.example.foodnow.data.MenuOptionResponse) {
+        val current = _draftMenuItem.value ?: return
+        val groups = current.optionGroups.toMutableList()
+        val index = groups.indexOfFirst { it.id == groupId }
+        if (index != -1) {
+            val group = groups[index]
+            val newOptions = group.options.toMutableList()
+            newOptions.add(option)
+            groups[index] = group.copy(options = newOptions)
+            _draftMenuItem.value = current.copy(optionGroups = groups)
+        }
     }
 
     fun saveDraft(context: android.content.Context) {
@@ -179,6 +205,7 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
                              uploadImageForMenuItem(context, createdId, _draftImageUri!!)
                          } else {
                              _saveStatus.value = Result.success(true)
+                             clearDraft() // Clear draft on success
                              getMenuItems()
                          }
                     } else {
@@ -195,6 +222,7 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
                              uploadImageForMenuItem(context, _draftId, _draftImageUri!!)
                          } else {
                              _saveStatus.value = Result.success(true)
+                             clearDraft() // Clear draft on success
                              getMenuItems()
                          }
                     } else {
@@ -219,6 +247,7 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
              val response = repository.uploadMenuItemImage(id, body)
              if (response.isSuccessful) {
                  _saveStatus.value = Result.success(true)
+                 clearDraft() // Clear draft on success
                  getMenuItems()
              } else {
                  _saveStatus.value = Result.failure(Exception("Image Upload failed: ${response.code()}"))
@@ -496,6 +525,19 @@ class RestaurantViewModel(private val repository: Repository) : ViewModel() {
                 }
             } catch (e: Exception) {
                 _passwordChangeStatus.value = Result.failure(e)
+            }
+        }
+    }
+    private val _ratings = MutableLiveData<Result<List<com.example.foodnow.data.RestaurantRatingResponse>>>()
+    val ratings: LiveData<Result<List<com.example.foodnow.data.RestaurantRatingResponse>>> = _ratings
+
+    fun fetchRatings() {
+        viewModelScope.launch {
+            try {
+                val result = repository.getRestaurantRatings()
+                _ratings.value = result
+            } catch (e: Exception) {
+                _ratings.value = Result.failure(e)
             }
         }
     }

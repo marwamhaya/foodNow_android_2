@@ -8,7 +8,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
 
 object RetrofitClient {//one instance exists in the app(singleton)
-    private const val BASE_URL = "http://192.168.1.6:8080/" // Physical device Computer's local IP can only be accessed inside RetrofitClient
 
     fun getInstance(tokenManager: TokenManager): ApiService {
         val logging = HttpLoggingInterceptor().apply {
@@ -26,7 +25,7 @@ object RetrofitClient {//one instance exists in the app(singleton)
         I built a custom AuthInterceptor that automatically injects the user's authentication token into the header of every outgoing request.
         This keeps the code clean because I don't have to manually add the token every time I want to fetch data.*/
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(com.example.foodnow.utils.Constants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -46,6 +45,8 @@ class Repository(private val apiService: ApiService, private val tokenManager: T
     suspend fun getRestaurants(): Response<PageResponse<RestaurantResponse>> = apiService.getAllRestaurants()
     
     suspend fun getMenuItems(restaurantId: Long, activeOnly: Boolean = true) = apiService.getMenuItems(restaurantId, activeOnly)
+    
+    suspend fun getPopularMenuItems() = apiService.getPopularMenuItems()
     
     suspend fun getMenuItemById(id: Long) = apiService.getMenuItemById(id)
 
@@ -115,8 +116,47 @@ class Repository(private val apiService: ApiService, private val tokenManager: T
     suspend fun submitRating(orderId: Long, rating: Int, comment: String) = 
         apiService.submitRating(RatingRequest(orderId, rating, comment))
 
+    suspend fun getRestaurantRatings(): Result<List<RestaurantRatingResponse>> {
+        return try {
+            val response = apiService.getRestaurantRatings()
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
+            } else {
+                Result.failure(Exception("Failed to fetch ratings: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getRestaurantReviews(id: Long): Result<List<RestaurantRatingResponse>> {
+        return try {
+            val response = apiService.getRestaurantReviews(id)
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
+            } else {
+                Result.failure(Exception("Failed to fetch reviews: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun uploadRestaurantImage(id: Long, image: okhttp3.MultipartBody.Part) = apiService.uploadRestaurantImage(id, image)
     suspend fun uploadMenuItemImage(id: Long, image: okhttp3.MultipartBody.Part) = apiService.uploadMenuItemImage(id, image)
+
+    suspend fun getRestaurantStats(): Result<RestaurantStatsResponse> {
+        return try {
+            val response = apiService.getRestaurantStats()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to fetch stats: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     fun saveAuth(token: String, role: String) {
         tokenManager.saveToken(token)

@@ -52,8 +52,7 @@ class MenuItemDetailsFragment : Fragment(R.layout.fragment_menu_item_details) {
 
             // Image
             if (!item.imageUrl.isNullOrEmpty()) {
-                val fullUrl = if (item.imageUrl.startsWith("http")) item.imageUrl
-                else "http://192.168.1.6:8080${item.imageUrl}"
+                val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(item.imageUrl)
                 Glide.with(this).load(fullUrl).into(ivImage)
             }
 

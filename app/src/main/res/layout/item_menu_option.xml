@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="4dp">
+
+    <TextView
+        android:id="@+id/tvOptionName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Option Name"
+        android:textSize="16sp"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/tvOptionPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$0.00"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- Only one of these will be visible usually, toggle programmatically -->
+    <RadioButton
+        android:id="@+id/rbOption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/uber_orange"
+        android:clickable="false" 
+        android:focusable="false"
+        android:visibility="gone"/>
+        <!-- clickable=false because the whole row will be clickable -->
+
+    <CheckBox
+        android:id="@+id/cbOption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/uber_orange"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone"/>
+
+</LinearLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Warm Food Palette -->
-    <color name="primary">#FE724C</color>
+    <color name="primary">#FF6D00</color>
     <color name="primary_variant">#D9522E</color>
     <color name="secondary">#FFC529</color>
     <color name="secondary_variant">#E6B024</color>
@@ -10,6 +10,7 @@
     <color name="surface">#FFFFFF</color>
     <color name="error">#FF3B30</color>
     <color name="success">#34C759</color>
+    <color name="promo_green">#2ecc71</color>
 
     <color name="text_primary">#1A1D26</color>
     <color name="text_secondary">#9A9FAE</color>
@@ -34,4 +35,5 @@
     <color name="uber_text_primary">@color/text_primary</color>
     <color name="uber_text_secondary">@color/text_secondary</color>
     <color name="uber_divider">@color/divider</color>
+    <color name="uber_orange">@color/primary</color>
 </resources>

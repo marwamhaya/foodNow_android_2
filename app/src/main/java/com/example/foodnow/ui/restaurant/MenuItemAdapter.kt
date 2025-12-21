@@ -37,8 +37,7 @@ class MenuItemAdapter(
         holder.tvDesc.text = item.description ?: ""
         
         if (!item.imageUrl.isNullOrEmpty()) {
-            val fullUrl = if (item.imageUrl!!.startsWith("http")) item.imageUrl 
-                           else "http://192.168.1.6:8080${item.imageUrl}"
+            val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(item.imageUrl)
             com.bumptech.glide.Glide.with(holder.itemView.context).load(fullUrl).into(holder.ivImage)
         } else {
             holder.ivImage.setImageResource(R.drawable.ic_launcher_background) // Placeholder

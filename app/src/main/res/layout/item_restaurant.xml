@@ -26,16 +26,7 @@
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_gallery" 
                 android:background="@color/background"/>
-            
-            <ImageButton
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="end|top"
-                android:layout_margin="12dp"
-                android:background="@drawable/bg_quantity_selector"
-                android:src="@android:drawable/ic_menu_save"
-                app:tint="@color/text_primary"
-                android:padding="6dp"/>
+
         </FrameLayout>
 
         <LinearLayout
@@ -91,6 +82,23 @@
                     android:textColor="@color/text_primary"
                     android:maxLines="1"
                     android:ellipsize="end"/>
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/star_on"
+                    app:tint="@color/primary"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4.5"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
                     
             </LinearLayout>
 

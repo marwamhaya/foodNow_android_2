@@ -7,14 +7,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.example.foodnow.FoodNowApp
 import com.example.foodnow.R
 import com.example.foodnow.ui.ViewModelFactory
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.card.MaterialCardView
 
 class RestaurantDashboardFragment : Fragment(R.layout.fragment_restaurant_dashboard) {
 
-    private val viewModel: RestaurantViewModel by viewModels {
+    private val viewModel: RestaurantViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as FoodNowApp).repository)
     }
 
@@ -33,6 +35,7 @@ class RestaurantDashboardFragment : Fragment(R.layout.fragment_restaurant_dashbo
         
         btnRefresh.setOnClickListener {
             viewModel.getMyRestaurant()
+            viewModel.fetchStats()
         }
 
         btnEditProfile.setOnClickListener {
@@ -48,8 +51,7 @@ class RestaurantDashboardFragment : Fragment(R.layout.fragment_restaurant_dashbo
                 
                 // Load restaurant image
                 if (!restaurant.imageUrl.isNullOrEmpty()) {
-                    val fullUrl = if (restaurant.imageUrl.startsWith("http")) restaurant.imageUrl
-                                   else "http://192.168.1.6:8080${restaurant.imageUrl}"
+                    val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(restaurant.imageUrl)
                     com.bumptech.glide.Glide.with(this)
                         .load(fullUrl)
                         .placeholder(android.R.drawable.ic_menu_gallery)
@@ -61,7 +63,56 @@ class RestaurantDashboardFragment : Fragment(R.layout.fragment_restaurant_dashbo
             }
         }
 
+        // Stats views
+        val tvTotalOrders = view.findViewById<TextView>(R.id.tvTotalOrders)
+        val tvTotalRevenue = view.findViewById<TextView>(R.id.tvTotalRevenue)
+        val tvAverageRating = view.findViewById<TextView>(R.id.tvAverageRating)
+        val tvTotalClients = view.findViewById<TextView>(R.id.tvTotalClients)
+
+        viewModel.stats.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { stats ->
+                tvTotalOrders.text = stats.totalOrders.toString()
+                tvTotalRevenue.text = String.format("%.2f DH", stats.totalRevenue)
+                tvAverageRating.text = String.format("%.1f", stats.averageRating)
+                tvTotalClients.text = stats.totalClients.toString()
+            }.onFailure {
+                Toast.makeText(context, "Stats Error: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Stats card click listeners - navigate to orders with specific filter
+        val cardTotalOrders = view.findViewById<MaterialCardView>(R.id.cardTotalOrders)
+        val cardTotalRevenue = view.findViewById<MaterialCardView>(R.id.cardTotalRevenue)
+        val cardAvgRating = view.findViewById<MaterialCardView>(R.id.cardAvgRating)
+        val cardTotalClients = view.findViewById<MaterialCardView>(R.id.cardTotalClients)
+
+        // Tab indices: 0=All, 1=Pending, 2=In Progress, 3=Ready, 4=Delivered, 5=Cancelled
+        cardTotalOrders?.setOnClickListener {
+            navigateToOrdersWithFilter(0) // All orders
+        }
+        
+        cardTotalRevenue?.setOnClickListener {
+            navigateToOrdersWithFilter(4) // Delivered (revenue from completed orders)
+        }
+        
+        cardAvgRating?.setOnClickListener {
+            // Navigate to ratings page
+            findNavController().navigate(R.id.action_menu_to_ratings)
+        }
+        
+        cardTotalClients?.setOnClickListener {
+            navigateToOrdersWithFilter(4) // Delivered (clients who completed orders)
+        }
+
         // Initial Load
         viewModel.getMyRestaurant()
+        viewModel.fetchStats()
+    }
+    
+    private fun navigateToOrdersWithFilter(filterTabIndex: Int) {
+        val bundle = Bundle().apply {
+            putInt("filterTab", filterTabIndex)
+        }
+        findNavController().navigate(R.id.restaurantOrdersFragment, bundle)
     }
 }

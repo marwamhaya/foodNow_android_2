@@ -25,6 +25,9 @@ interface ApiService {
         @Query("activeOnly") activeOnly: Boolean = true
     ): Response<List<MenuItemResponse>>
 
+    @GET("/api/menu-items/popular")
+    suspend fun getPopularMenuItems(): Response<List<MenuItemResponse>>
+
     @GET("/api/orders/client")
     suspend fun getMyOrders(): Response<List<Order>>
 
@@ -100,8 +103,17 @@ interface ApiService {
     @retrofit2.http.PATCH("/api/driver-locations")
     suspend fun updateLocation(@Body location: LocationUpdateDto): Response<Void>
 
-    @POST("/api/ratings")
-    suspend fun submitRating(@Body request: RatingRequest): Response<Void>
+    @POST("/api/ratings/restaurant")
+    suspend fun submitRating(@Body request: RatingRequest): Response<Unit>
+
+    @GET("/api/ratings/restaurant/my-ratings")
+    suspend fun getRestaurantRatings(): Response<List<RestaurantRatingResponse>>
+
+    @GET("/api/ratings/restaurant/{id}")
+    suspend fun getRestaurantReviews(@Path("id") id: Long): Response<List<RestaurantRatingResponse>>
+
+    @GET("/api/restaurants/my-stats")
+    suspend fun getRestaurantStats(): Response<RestaurantStatsResponse>
 
     // GPS Location Tracking
     @POST("/api/orders/{orderId}/location")

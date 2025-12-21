@@ -35,74 +35,109 @@ class ItemDetailsBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // Bind basic item info
         binding.tvItemName.text = menuItem.name
-        binding.tvItemDesc.text = menuItem.description
-        binding.tvCategory.text = "📂 ${menuItem.category}"
+        binding.tvBasePrice.text = "${String.format("%.2f", menuItem.price)} DH"
         
-        // Display availability status
-        if (menuItem.isAvailable == true) {
-            binding.tvAvailability.text = "✅ Available"
-            binding.tvAvailability.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-        } else {
-            binding.tvAvailability.text = "❌ Sold Out"
-            binding.tvAvailability.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
-            binding.btnAddToCart.isEnabled = false
-            binding.btnAddToCart.alpha = 0.5f
+        // Show Category
+        binding.tvCategory.text = menuItem.category ?: "General"
+
+        // Load Image
+        if (!menuItem.imageUrl.isNullOrEmpty()) {
+            val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(menuItem.imageUrl)
+            com.bumptech.glide.Glide.with(this)
+                .load(fullUrl)
+                .centerCrop()
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .into(binding.ivItemImage)
         }
-        
+
+        // Close Button
+        binding.btnClose.setOnClickListener { dismiss() }
+
         updateTotalPrice()
 
         // Dynamically add options
         menuItem.optionGroups.orEmpty().forEach { group ->
+            // Group Title
             val groupTitle = TextView(context).apply {
-                text = "${group.name} ${if (group.isRequired) "(Required)" else "(Optional)"}"
-                textSize = 16f
-                setPadding(0, 16, 0, 8)
+                text = "${group.name} ${if (group.isRequired) "(Required)" else ""}" // Removed (Optional) to clean up
+                textSize = 18f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setTextColor(resources.getColor(R.color.black, null))
+                setPadding(0, 32, 0, 16)
             }
             binding.optionsContainer.addView(groupTitle)
 
-            if (group.isMultiple) {
-                // Checkboxes
-                group.options.forEach { option ->
-                    val cb = CheckBox(context).apply {
-                        text = "${option.name} (+${option.extraPrice}€)"
-                        setOnCheckedChangeListener { _, isChecked ->
-                            toggleOption(group.id, option, isChecked, true)
+            // Inflate option rows
+            group.options.forEach { option ->
+                val optionView = LayoutInflater.from(context).inflate(R.layout.item_menu_option, binding.optionsContainer, false)
+                val tvName = optionView.findViewById<TextView>(R.id.tvOptionName)
+                val tvPrice = optionView.findViewById<TextView>(R.id.tvOptionPrice)
+                val rb = optionView.findViewById<RadioButton>(R.id.rbOption)
+                val cb = optionView.findViewById<CheckBox>(R.id.cbOption)
+
+                tvName.text = option.name
+                tvPrice.text = if (option.extraPrice.toDouble() > 0) "+${option.extraPrice}DH" else "Free"
+
+                if (group.isMultiple) {
+                    cb.visibility = View.VISIBLE
+                    rb.visibility = View.GONE
+                    
+                    // Restore state if needed (not persistent here yet)
+                    
+                    val clickListener = View.OnClickListener {
+                        val isChecked = !cb.isChecked 
+                        cb.isChecked = isChecked
+                        toggleOption(group.id, option, isChecked, true)
+                    }
+                    optionView.setOnClickListener(clickListener)
+                    cb.setOnClickListener { toggleOption(group.id, option, cb.isChecked, true) }
+                    
+                } else {
+                    rb.visibility = View.VISIBLE
+                    cb.visibility = View.GONE
+                    
+                    // Radio Logic handling manually to allow row clicks across multiple inflated views
+                    // We need to manage the "RadioGroup" behavior manually since they aren't in a real RadioGroup
+                    
+                    val updateSelection = {
+                        // Uncheck others in this group
+                        val childCount = binding.optionsContainer.childCount
+                        for (i in 0 until childCount) {
+                            val v = binding.optionsContainer.getChildAt(i)
+                            // Check if this view belongs to the same group (this is tricky without tags, let's use tags)
+                            if (v.tag == group.id) {
+                                val otherRb = v.findViewById<RadioButton>(R.id.rbOption)
+                                if (otherRb != null) otherRb.isChecked = false
+                            }
                         }
+                        rb.isChecked = true
+                        
+                        // Update logic
+                        selectedOptions[group.id] = mutableListOf(option)
+                        updateTotalPrice()
                     }
-                    binding.optionsContainer.addView(cb)
+
+                    optionView.tag = group.id // Mark view as belonging to this group
+                    optionView.setOnClickListener { updateSelection() }
+                    rb.setOnClickListener { updateSelection() }
                 }
-            } else {
-                // RadioGroup
-                val radioGroup = RadioGroup(context)
-                group.options.forEach { option ->
-                    val rb = RadioButton(context).apply {
-                        text = "${option.name} (+${option.extraPrice}€)"
-                        tag = option
-                    }
-                    radioGroup.addView(rb)
-                }
-                radioGroup.setOnCheckedChangeListener { groupView, checkedId ->
-                    val rb = groupView.findViewById<RadioButton>(checkedId)
-                    val option = rb.tag as MenuOptionResponse
-                    // Clear previous selection for this group
-                    selectedOptions[group.id] = mutableListOf(option)
-                    updateTotalPrice()
-                }
-                binding.optionsContainer.addView(radioGroup)
+
+                binding.optionsContainer.addView(optionView)
             }
         }
 
         binding.btnIncrease.setOnClickListener {
             quantity++
-            binding.tvQuantity.text = quantity.toString()
+            binding.tvQuantity.text = String.format("%02d", quantity)
             updateTotalPrice()
         }
 
         binding.btnDecrease.setOnClickListener {
             if (quantity > 1) {
                 quantity--
-                binding.tvQuantity.text = quantity.toString()
+                binding.tvQuantity.text = String.format("%02d", quantity)
                 updateTotalPrice()
             }
         }
@@ -152,10 +187,13 @@ class ItemDetailsBottomSheet(
         val basePrice = menuItem.price.toDouble()
         val optionsPrice = selectedOptions.values.flatten().sumOf { it.extraPrice.toDouble() }
         val total = (basePrice + optionsPrice) * quantity
-        binding.btnAddToCart.text = "Add to Cart - ${String.format("%.2f", total)}€"
+        
+        // Update Total Text and Add Button
+        binding.tvTotalPrice.text = "${String.format("%.2f", total)}DH"
+        binding.btnAddToCart.text = "Add to Cart" // Fixed text, total is above
     }
 
-    private fun validateSelections(): Boolean {
+    private fun validateSelections(): Boolean { 
         menuItem.optionGroups.orEmpty().filter { it.isRequired }.forEach { group ->
             if (selectedOptions[group.id].isNullOrEmpty()) {
                 Toast.makeText(context, "Please select ${group.name}", Toast.LENGTH_SHORT).show()

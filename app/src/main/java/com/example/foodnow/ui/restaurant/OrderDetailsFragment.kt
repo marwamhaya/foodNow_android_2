@@ -6,17 +6,16 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodnow.FoodNowApp
 import com.example.foodnow.R
 import com.example.foodnow.ui.ViewModelFactory
-import java.math.BigDecimal
 
 class OrderDetailsFragment : Fragment(R.layout.fragment_order_details) {
 
-    private val viewModel: RestaurantViewModel by viewModels {
+    private val viewModel: RestaurantViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as FoodNowApp).repository)
     }
 
@@ -27,6 +26,7 @@ class OrderDetailsFragment : Fragment(R.layout.fragment_order_details) {
 
         orderId = arguments?.getLong("orderId", -1L) ?: -1L
         if (orderId == -1L) {
+             Toast.makeText(context, "Invalid order ID", Toast.LENGTH_SHORT).show()
              return
         }
 
@@ -34,30 +34,46 @@ class OrderDetailsFragment : Fragment(R.layout.fragment_order_details) {
         val tvDate = view.findViewById<TextView>(R.id.tvOrderDate)
         val tvStatus = view.findViewById<TextView>(R.id.tvOrderStatus)
         val tvTotal = view.findViewById<TextView>(R.id.tvTotalAmount)
+        val tvClientName = view.findViewById<TextView>(R.id.tvClientName)
+        val tvClientPhone = view.findViewById<TextView>(R.id.tvClientPhone)
+        val tvDeliveryAddress = view.findViewById<TextView>(R.id.tvDeliveryAddress)
         val rvItems = view.findViewById<RecyclerView>(R.id.rvOrderItems)
         val btnAction1 = view.findViewById<Button>(R.id.btnAction1)
         val btnAction2 = view.findViewById<Button>(R.id.btnAction2)
 
         rvItems.layoutManager = LinearLayoutManager(context)
-        // Need simple item adapter. Reuse or create local?
-        // I'll create a simple local logic or reuse OptionsAdapter if compatible? No.
-        // I need to display OrderItem (name, quantity, price, options).
-        // I'll assume we can create OrderItemsAdapter.
 
         viewModel.orders.observe(viewLifecycleOwner) { result ->
              val order = result.getOrNull()?.find { it.id == orderId }
              if (order != null) {
                  tvId.text = "Order #${order.id}"
-                 tvDate.text = "Date: ${order.createdAt}"
-                 tvStatus.text = "Status: ${order.status}"
-                 tvTotal.text = "Total: ${order.totalAmount} DH"
+                 tvDate.text = "Date: ${order.createdAt.take(16).replace("T", " ")}"
+                 tvStatus.text = order.status
+                 tvTotal.text = "${String.format("%.2f", order.totalAmount)} DH"
+                 tvClientName.text = "Client: ${order.clientName ?: "Unknown"}"
+                 tvClientPhone?.text = "Phone: ${order.clientPhone ?: "N/A"}"
+                 tvDeliveryAddress?.text = "Delivery: ${order.deliveryAddress ?: "N/A"}"
                  
-                 // Update buttons based on status
+                 // Update buttons based on status - only show for PENDING
                  updateButtons(order.status, btnAction1, btnAction2)
                  
-                 // Adapter
-                 rvItems.adapter = OrderItemsAdapter(order.items)
+                 // Set items adapter
+                 if (order.items.isNotEmpty()) {
+                     rvItems.adapter = OrderItemsAdapter(order.items)
+                 } else {
+                     // Show empty message
+                     Toast.makeText(context, "No items in order", Toast.LENGTH_SHORT).show()
+                 }
              }
+        }
+
+        viewModel.orderActionStatus.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { msg ->
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                viewModel.getOrders() // Refresh to update status
+            }.onFailure { e ->
+                Toast.makeText(context, "Action failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
         
         btnAction1.setOnClickListener {
@@ -72,7 +88,7 @@ class OrderDetailsFragment : Fragment(R.layout.fragment_order_details) {
         btnAction2.setOnClickListener {
              val order = viewModel.orders.value?.getOrNull()?.find { it.id == orderId } ?: return@setOnClickListener
              if (order.status == "PENDING") {
-                 viewModel.rejectOrder(orderId, "Busy")
+                 viewModel.rejectOrder(orderId, "Declined by restaurant")
              }
         }
     }

@@ -32,18 +32,37 @@ class MenuViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    private val _cart = MutableLiveData<MutableList<OrderItemRequest>>(mutableListOf())
-    val cart: LiveData<MutableList<OrderItemRequest>> = _cart
-    
+    // Cart logic delegated to CartManager
+
+    private val _restaurantDetails = MutableLiveData<Result<com.example.foodnow.data.RestaurantResponse>>()
+    val restaurantDetails: LiveData<Result<com.example.foodnow.data.RestaurantResponse>> = _restaurantDetails
+
+    fun loadRestaurantDetails(restaurantId: Long) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getRestaurantById(restaurantId)
+                if (response.isSuccessful && response.body() != null) {
+                    _restaurantDetails.value = Result.success(response.body()!!)
+                } else {
+                    _restaurantDetails.value = Result.failure(Exception("Failed to load restaurant details: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                _restaurantDetails.value = Result.failure(e)
+            }
+        }
+    }
+
+    private val _restaurantReviews = MutableLiveData<Result<List<com.example.foodnow.data.RestaurantRatingResponse>>>()
+    val restaurantReviews: LiveData<Result<List<com.example.foodnow.data.RestaurantRatingResponse>>> = _restaurantReviews
+
+    fun loadRestaurantReviews(restaurantId: Long) {
+        viewModelScope.launch {
+            _restaurantReviews.value = repository.getRestaurantReviews(restaurantId)
+        }
+    }
+
     private val _orderResult = MutableLiveData<Result<Order>>()
     val orderResult: LiveData<Result<Order>> = _orderResult
-
-    fun addToCart(item: MenuItemResponse) {
-        val currentCart = _cart.value ?: mutableListOf()
-        // Simple logic: If item exists, ignored for this demo, or just add new entry
-        currentCart.add(OrderItemRequest(item.id, 1))
-        _cart.value = currentCart
-    }
 
     fun placeOrder(restaurantId: Long, latitude: Double, longitude: Double) {
         val items = CartManager.getOrderRequests()
@@ -51,7 +70,8 @@ class MenuViewModel(private val repository: Repository) : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val request = OrderRequest(restaurantId, items, "Default Delivery Address")
+                // Pass location in the order request itself (in case backend expects it there)
+                val request = OrderRequest(restaurantId, items, "Default Delivery Address", latitude, longitude)
                 val response = repository.createOrder(request)
                 if (response.isSuccessful && response.body() != null) {
                     val order = response.body()!!
@@ -59,7 +79,13 @@ class MenuViewModel(private val repository: Repository) : ViewModel() {
                     // Save client GPS location for this order
                     try {
                         val locationDto = com.example.foodnow.data.LocationUpdateDto(latitude, longitude)
-                        repository.saveOrderLocation(order.id, locationDto)
+                        val locResponse = repository.saveOrderLocation(order.id, locationDto)
+                        if (!locResponse.isSuccessful) {
+                             android.util.Log.e("MenuViewModel", "Failed to save location. Code: ${locResponse.code()}, Error: ${locResponse.errorBody()?.string()}")
+                             // Ideally we could surface this warning to the user, but for now we Log it.
+                        } else {
+                             android.util.Log.d("MenuViewModel", "Location saved successfully for Order ${order.id}")
+                        }
                     } catch (e: Exception) {
                         // Log but don't fail the order if location save fails
                         android.util.Log.e("MenuViewModel", "Failed to save order location", e)
@@ -96,6 +122,23 @@ class MenuViewModel(private val repository: Repository) : ViewModel() {
                 }
             } catch (e: Exception) {
                 _paymentResult.value = Result.failure(e)
+            }
+        }
+    }
+    private val _userProfile = MutableLiveData<Result<com.example.foodnow.data.AuthResponse>>()
+    val userProfile: LiveData<Result<com.example.foodnow.data.AuthResponse>> = _userProfile
+
+    fun loadUserProfile() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getUserProfile()
+                if (response.isSuccessful && response.body() != null) {
+                    _userProfile.value = Result.success(response.body()!!)
+                } else {
+                    _userProfile.value = Result.failure(Exception("Failed to load profile: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                _userProfile.value = Result.failure(e)
             }
         }
     }

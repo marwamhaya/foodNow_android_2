@@ -13,6 +13,7 @@ data class RegisterRequest(
     val fullName: String,
     val email: String,
     val password: String,
+    val phoneNumber: String?,
     val role: String = "CLIENT" 
 )
 
@@ -42,12 +43,16 @@ data class RestaurantResponse(
     val isActive: Boolean,
     val ownerId: Long?,
     val ownerName: String?,
-    val openingHours: String?
+    val openingHours: String?,
+    val averageRating: Double?,
+    val ratingCount: Int?
 )
 
 // Menu
 data class MenuItemResponse(
     val id: Long,
+    val restaurantId: Long?,
+    val restaurantName: String?,
     val name: String,
     val description: String?,
     val price: BigDecimal,
@@ -60,7 +65,9 @@ data class MenuItemResponse(
 data class MenuOptionGroupResponse(
     val id: Long,
     val name: String,
+    @SerializedName("required")
     val isRequired: Boolean,
+    @SerializedName("multiple")
     val isMultiple: Boolean,
     val options: List<MenuOptionResponse>
 )
@@ -123,7 +130,11 @@ data class PageResponse<T>(
 
 data class Order(
     val id: Long,
-    val restaurantName: String, // Assuming backend projection or fetch
+    val restaurantName: String,
+    val restaurantImageUrl: String?,
+    val restaurantAddress: String?,
+    val clientName: String?,
+    val clientPhone: String?, // NEW: For restaurant to call client
     val status: String,
     val totalAmount: BigDecimal,
     val deliveryAddress: String?,
@@ -179,6 +190,7 @@ data class OrderLocationResponse(
 data class OrderItem(
     val id: Long,
     val menuItemName: String,
+    val menuItemImageUrl: String? = null,
     val quantity: Int,
     @SerializedName("unitPrice")
     val price: BigDecimal,
@@ -193,7 +205,9 @@ data class SelectedOptionResponse(
 data class OrderRequest(
     val restaurantId: Long,
     val items: List<OrderItemRequest>,
-    val deliveryAddress: String? = null
+    val deliveryAddress: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 data class OrderItemRequest(
@@ -216,4 +230,20 @@ data class RatingRequest(
 data class PaymentResponse(
     val status: String,
     val message: String
+)
+
+data class RestaurantRatingResponse(
+    val id: Long,
+    val clientName: String,
+    val rating: Int,
+    val comment: String?,
+    val createdAt: String
+)
+
+data class RestaurantStatsResponse(
+    val totalOrders: Long,
+    val totalRevenue: Double,
+    val averageRating: Double,
+    val ratingCount: Int,
+    val totalClients: Int
 )

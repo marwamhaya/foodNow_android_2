@@ -3,89 +3,285 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/uber_white"
-    android:padding="16dp">
+    android:background="@color/uber_white">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/uber_white"
         android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            android:layout_height="250dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary">
 
-            <LinearLayout
+            <ImageView
+                android:id="@+id/ivRestaurantImage"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="16dp">
-
-                <TextView
-                    android:id="@+id/tvRestaurantName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Restaurant Name"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/uber_black"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingTop="16dp"/>
-
-                <TextView
-                     android:id="@+id/tvRestaurantRating"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:text="★ 4.8 (500+) • Japanese • Sushi • $$"
-                     android:textSize="14sp"
-                     android:textColor="@color/uber_text_secondary"
-                     android:paddingStart="16dp"
-                     android:paddingEnd="16dp"
-                     android:paddingTop="4dp"/>
-                     
-                <TextView
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:text="Tap for hours, info, and more"
-                     android:textSize="14sp"
-                     android:textColor="@color/uber_text_secondary"
-                     android:paddingStart="16dp"
-                     android:paddingEnd="16dp"
-                     android:paddingTop="4dp"/>
-
-    <!-- Delivery/Pickup options removed -->
-
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bg_bottom_sheet"
+                app:layout_collapseMode="parallax" />
+                <!-- bg_bottom_sheet is placeholder, ideally restaurant image -->
+            
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/uber_white">
+
+            <TextView
+                android:id="@+id/tvRestaurantName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Restaurant Name"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/uber_black"/>
+
+            <TextView
+                android:id="@+id/tvRestaurantRating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="★ 4.8 (500+) • Japanese • Sushi • $$"
+                android:textSize="14sp"
+                android:textColor="@color/uber_text_secondary"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/uber_white"
+            app:tabTextColor="@color/uber_text_secondary"
+            app:tabSelectedTextColor="@color/uber_orange"
+            app:tabRippleColor="@color/uber_orange"
+            app:tabIndicatorColor="@color/uber_orange"
+            app:tabIndicatorHeight="3dp"
+            app:tabIndicatorFullWidth="false" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <!-- Content Area -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp" />
+            android:layout_height="match_parent">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+            <!-- ORDER TAB CONTENT -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:clipToPadding="false"
+                android:paddingBottom="80dp" />
 
-    </FrameLayout>
-    
-    <!-- Floating Action Button for Group Order or Cart could go here -->
+            <!-- REVIEW TAB CONTENT -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvReviews"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:clipToPadding="false"
+                android:paddingBottom="80dp"/>
+
+            <!-- INFO TAB CONTENT -->
+            <LinearLayout
+                android:id="@+id/layoutInfo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <!-- About Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="About"
+                            android:textSize="18sp"
+                            android:textColor="@color/uber_orange"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvInfoDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/uber_text_secondary"
+                            android:text="Restaurant description..." />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Location & Hours Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Location &amp; Hours"
+                            android:textSize="18sp"
+                            android:textColor="@color/uber_orange"
+                            android:layout_marginBottom="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_dialog_map"
+                                app:tint="@color/uber_black"/>
+
+                            <TextView
+                                android:id="@+id/tvInfoAddress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:textSize="14sp"
+                                android:textColor="@color/uber_black"
+                                android:text="123 Example St"/>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/uber_divider"
+                            android:layout_marginBottom="12dp"/>
+
+                         <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_agenda"
+                                app:tint="@color/uber_black"/>
+
+                            <TextView
+                                android:id="@+id/tvInfoHours"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:textSize="14sp"
+                                android:textColor="@color/uber_black"
+                                android:text="Open: 9:00 - 22:00"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Contact Section (Optional) -->
+                  <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardContact"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phone Number"
+                            android:textSize="18sp"
+                            android:textColor="@color/uber_orange"
+                            android:layout_marginBottom="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_call"
+                                app:tint="@color/uber_black"/>
+
+                            <TextView
+                                android:id="@+id/tvInfoPhone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:textSize="14sp"
+                                android:textColor="@color/uber_black"
+                                android:text="Call Restaurant"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- Cart Layout -->
     <LinearLayout
         android:id="@+id/layoutCart"
         android:layout_width="match_parent"

@@ -126,7 +126,7 @@ class TrackOrderFragment : Fragment(R.layout.fragment_track_order) {
             return
         }
         
-        val url = "ws://192.168.1.6:8080/ws-foodnow/websocket"
+        val url = com.example.foodnow.utils.Constants.WS_URL
         
         // Create OkHttpClient with auth headers
         val client = okhttp3.OkHttpClient.Builder()

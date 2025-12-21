@@ -12,12 +12,8 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent
 object WebSocketService {
 
     private const val TAG = "WebSocketService"
-    // Use 10.0.2.2 for Android Emulator to localhost, or specific IP for physical device
-    // The user's metadata says c:\Users\PC. If on emulator, 10.0.2.2. If physical, need IP.
-    // User context mentions "failed to connect to 192.168.1.6:8080" in previous convo.
-    // I should probably use a configurable URL or the one from ApiService.
-    // For now I'll hardcode a likely IP but ideally it should follow the Retrofit BaseUrl.
-    private const val WS_URL = "ws://192.168.1.6:8080/ws-foodnow/websocket" 
+    // Use Constants for the WebSocket URL
+    private val WS_URL = com.example.foodnow.utils.Constants.WS_URL
 
     private var stompClient: StompClient? = null
     private val compositeDisposable = CompositeDisposable()

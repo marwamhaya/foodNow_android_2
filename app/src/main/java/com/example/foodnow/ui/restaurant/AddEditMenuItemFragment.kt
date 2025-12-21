@@ -77,8 +77,8 @@ class AddEditMenuItemFragment : Fragment(R.layout.fragment_add_edit_menu_item) {
         progressBarImage = view.findViewById(R.id.progressBarImage)
         val tvSupplementsPreview = view.findViewById<android.widget.TextView>(R.id.tvSupplementsPreview)
         
-        // Enable "Manage Supplements" only when editing an existing item
-        btnSupplements.isEnabled = menuItemId > 0
+        // Enable "Manage Supplements" for all items
+        btnSupplements.isEnabled = true
 
         // Observe Draft State
         viewModel.draftMenuItem.observe(viewLifecycleOwner) { draft ->
@@ -103,7 +103,7 @@ class AddEditMenuItemFragment : Fragment(R.layout.fragment_add_edit_menu_item) {
              
              // Image logic
              if (!draft.imageUrl.isNullOrEmpty()) {
-                  val fullUrl = if (draft.imageUrl.startsWith("http")) draft.imageUrl else "http://192.168.1.6:8080${draft.imageUrl}"
+                  val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(draft.imageUrl)
                   Glide.with(this).load(fullUrl).into(ivImage)
              }
              

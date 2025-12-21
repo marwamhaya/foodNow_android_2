@@ -32,23 +32,31 @@ class MenuAdapter(
     override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         val item = menuItems[position]
         holder.tvName.text = item.name
+        // Truncate description more aggressively for list view
         holder.tvDescription.text = item.description ?: ""
         holder.tvPrice.text = "${String.format("%.2f", item.price)} DH"
+        
+        // Mock popularity for now
+        val randomLikes = (10..500).random()
+        val randomPercentage = (90..99).random()
 
         if (!item.imageUrl.isNullOrEmpty()) {
-            val fullUrl = if (item.imageUrl.startsWith("http")) item.imageUrl 
-                           else "http://192.168.1.6:8080${item.imageUrl}"
+            val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(item.imageUrl)
             Glide.with(holder.itemView.context)
                 .load(fullUrl)
                 .placeholder(android.R.drawable.ic_menu_gallery)
+                .centerCrop()
                 .into(holder.ivDish)
         } else {
             holder.ivDish.setImageResource(android.R.drawable.ic_menu_gallery)
         }
 
+        // Click on item opens details
         holder.itemView.setOnClickListener {
             onItemClick(item)
         }
+        
+
     }
 
     override fun getItemCount() = menuItems.size

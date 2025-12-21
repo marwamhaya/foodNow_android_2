@@ -1,49 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:padding="12dp"
-    android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground">
 
+    <!-- Item Image -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardItemImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        
+        <ImageView
+            android:id="@+id/ivItemImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_food"
+            android:background="@color/background"/>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Quantity Badge -->
     <TextView
         android:id="@+id/tvQuantity"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:text="2x"
-        android:textSize="16sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:gravity="center"
         android:background="@drawable/bg_quantity_selector"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@id/cardItemImage"
+        app:layout_constraintTop_toTopOf="@id/cardItemImage"
+        android:translationX="-4dp"
+        android:translationY="-4dp"/>
 
-    <LinearLayout
+    <!-- Item Name -->
+    <TextView
+        android:id="@+id/tvItemName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="12dp">
+        android:text="Pizza Margherita"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/cardItemImage"
+        app:layout_constraintTop_toTopOf="@id/cardItemImage"
+        app:layout_constraintEnd_toStartOf="@id/tvItemPrice"/>
 
-        <TextView
-            android:id="@+id/tvItemName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pizza Margherita"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"/>
+    <!-- Item Details (Supplements) -->
+    <TextView
+        android:id="@+id/tvItemDetails"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="+ Extra Cheese"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/cardItemImage"
+        app:layout_constraintTop_toBottomOf="@id/tvItemName"
+        app:layout_constraintEnd_toStartOf="@id/tvItemPrice"/>
 
-        <TextView
-            android:id="@+id/tvItemDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+ Extra Cheese"
-            android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            android:visibility="gone"/>
-    </LinearLayout>
-
+    <!-- Item Price -->
     <TextView
         android:id="@+id/tvItemPrice"
         android:layout_width="wrap_content"
@@ -51,6 +84,9 @@
         android:text="24.00 DH"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="@color/text_primary"/>
+        android:textColor="@color/uber_orange"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

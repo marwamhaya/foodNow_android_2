@@ -51,6 +51,25 @@ class RestaurantMenuFragment : Fragment(R.layout.fragment_restaurant_menu) {
         }
 
         val tvEmpty = view.findViewById<android.widget.TextView>(R.id.tvEmptyState)
+        val tvRating = view.findViewById<android.widget.TextView>(R.id.tvRating)
+        val tvRatingCount = view.findViewById<android.widget.TextView>(R.id.tvRatingCount)
+        val containerRatings = view.findViewById<View>(R.id.containerRatings)
+
+        containerRatings.setOnClickListener {
+             try {
+                 findNavController().navigate(R.id.action_menu_to_ratings)
+             } catch (e: Exception) {
+                 // Fallback if action not found or similar
+                 Toast.makeText(context, "Nav error: ${e.message}", Toast.LENGTH_SHORT).show()
+             }
+        }
+
+        viewModel.restaurant.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { rest ->
+                 tvRating.text = String.format("%.1f", rest.averageRating ?: 0.0)
+                 tvRatingCount.text = "(${rest.ratingCount ?: 0})"
+            }
+        }
 
         viewModel.menuItems.observe(viewLifecycleOwner) { result ->
             result.onSuccess { items ->

@@ -19,6 +19,7 @@ class RestaurantAdapter(
         val ivRestaurant: ImageView = itemView.findViewById(R.id.ivRestaurant)
         val tvName: TextView = itemView.findViewById(R.id.tvName)
         val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
+        val tvRating: TextView = itemView.findViewById(R.id.tvRating)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RestaurantViewHolder {
@@ -31,9 +32,12 @@ class RestaurantAdapter(
         holder.tvName.text = restaurant.name
         holder.tvDescription.text = restaurant.description ?: "No description available"
         
+        val rating = restaurant.averageRating ?: 0.0
+        val count = restaurant.ratingCount ?: 0
+        holder.tvRating.text = "${String.format("%.1f", rating)} ($count)"
+        
         if (!restaurant.imageUrl.isNullOrEmpty()) {
-            val fullUrl = if (restaurant.imageUrl.startsWith("http")) restaurant.imageUrl 
-                           else "http://192.168.1.6:8080${restaurant.imageUrl}"
+            val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(restaurant.imageUrl)
             Glide.with(holder.itemView.context)
                 .load(fullUrl)
                 .placeholder(android.R.drawable.ic_menu_gallery)

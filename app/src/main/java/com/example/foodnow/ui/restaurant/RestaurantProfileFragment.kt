@@ -12,6 +12,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.foodnow.FoodNowApp
@@ -26,7 +27,7 @@ import java.io.FileOutputStream
 
 class RestaurantProfileFragment : Fragment(R.layout.fragment_restaurant_profile) {
 
-    private val viewModel: RestaurantViewModel by viewModels {
+    private val viewModel: RestaurantViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as FoodNowApp).repository)
     }
 
@@ -91,9 +92,8 @@ class RestaurantProfileFragment : Fragment(R.layout.fragment_restaurant_profile)
                 if (!restaurant.imageUrl.isNullOrEmpty()) {
                     // Construct full URL if needed or handle absolute path from backend
                     // Backend returns "/uploads/..."
-                    // Base URL is http://192.168.1.6:8080
-                    val fullUrl = if (restaurant.imageUrl.startsWith("http")) restaurant.imageUrl 
-                                  else "http://192.168.1.6:8080${restaurant.imageUrl}"
+                    // Base URL is centralized in Constants.BASE_URL
+                    val fullUrl = com.example.foodnow.utils.Constants.getFullImageUrl(restaurant.imageUrl)
                     
                     Glide.with(this)
                         .load(fullUrl)
@@ -108,7 +108,10 @@ class RestaurantProfileFragment : Fragment(R.layout.fragment_restaurant_profile)
             progressBar.visibility = View.GONE
             btnSave.isEnabled = true
             result.onSuccess { 
-                if (it) Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                if (it) {
+                    Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                    viewModel.getMyRestaurant() // Refresh to sync
+                }
             }.onFailure {
                 Toast.makeText(context, "Update failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
@@ -139,12 +142,15 @@ class RestaurantProfileFragment : Fragment(R.layout.fragment_restaurant_profile)
         progressBar.visibility = View.VISIBLE
         btnSave.isEnabled = false
 
+        val currentRestaurant = viewModel.restaurant.value?.getOrNull()
+        val currentImageUrl = currentRestaurant?.imageUrl
+
         val request = RestaurantRequest(
             name = name,
             address = address,
             description = desc,
             phone = phone,
-            imageUrl = null, // Not updating image here
+            imageUrl = currentImageUrl, // Preserve existing image URL
             openingHours = openingHours,
             ownerEmail = "", // Ignored by backend for update if empty/null (logic added)
             ownerPassword = "",

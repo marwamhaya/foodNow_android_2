@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodnow.FoodNowApp
@@ -30,8 +31,8 @@ class SupplementEditorFragment : Fragment(R.layout.fragment_supplement_editor) {
 
         rvGroups.layoutManager = LinearLayoutManager(context)
         adapter = OptionGroupAdapter { group ->
-            Toast.makeText(context, "Editing group: ${group.name}", Toast.LENGTH_SHORT).show()
-            // Future: Navigate to detail of group or show dialog to edit group
+            val bundle = Bundle().apply { putLong("groupId", group.id) }
+            findNavController().navigate(R.id.action_supplements_to_group, bundle)
         }
         rvGroups.adapter = adapter
         

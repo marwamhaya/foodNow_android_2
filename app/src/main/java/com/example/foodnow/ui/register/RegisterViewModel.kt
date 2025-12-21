@@ -13,10 +13,10 @@ class RegisterViewModel(private val repository: Repository) : ViewModel() {
     private val _registerResult = MutableLiveData<Result<Boolean>>()
     val registerResult: LiveData<Result<Boolean>> = _registerResult
 
-    fun register(fullName: String, email: String, password: String) {
+    fun register(fullName: String, email: String, password: String, phoneNumber: String) {
         viewModelScope.launch {
             try {
-                val response = repository.register(RegisterRequest(fullName, email, password))
+                val response = repository.register(RegisterRequest(fullName, email, password, phoneNumber))
                 if (response.isSuccessful && response.body() != null) {
                     _registerResult.value = Result.success(true)
                 } else {

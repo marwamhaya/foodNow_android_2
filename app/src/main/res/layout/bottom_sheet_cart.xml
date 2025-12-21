@@ -3,17 +3,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/white">
 
-    <TextView
+    <!-- Header -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="My Order"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary"
-        android:gravity="center"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="16dp">
+        
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_close"
+            android:layout_centerVertical="true"
+            app:tint="@color/text_primary"/>
+            
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cart"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" 
+            android:layout_toEndOf="@id/btnClose"
+            android:layout_marginStart="16dp"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCartItems"
@@ -23,35 +40,34 @@
         android:clipToPadding="false"
         android:paddingBottom="16dp"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider"
-        android:layout_marginBottom="16dp"/>
+    <!-- Discount Code -->
 
-    <LinearLayout
+    <!-- Total and Button -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginBottom="16dp">
         
         <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total"
             android:textSize="18sp"
-            android:textColor="@color/text_secondary"/>
+            android:textStyle="bold"
+            android:textColor="@color/text_secondary"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/tvTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0.00€"
-            android:textSize="20sp"
+            android:text="0.00DH"
+            android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@color/text_primary"/>
-    </LinearLayout>
+            android:textColor="#FF6D00"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
 
     <Button
         android:id="@+id/btnPlaceOrder"
@@ -60,9 +76,9 @@
         android:text="Checkout"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:backgroundTint="@color/primary"
+        android:backgroundTint="#FF6D00"
         android:textColor="@color/white"
-        app:cornerRadius="12dp"
+        app:cornerRadius="28dp"
         android:stateListAnimator="@null"/>
 
 </LinearLayout>

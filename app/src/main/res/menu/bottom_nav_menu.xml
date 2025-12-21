@@ -2,14 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@id/homeFragment"
-        android:icon="@android:drawable/ic_menu_compass"
+        android:icon="@drawable/ic_nav_home"
         android:title="Home" />
     <item
+        android:id="@id/allRestaurantsFragment"
+        android:icon="@drawable/ic_nav_search"
+        android:title="Browse" />
+    <item
         android:id="@id/ordersFragment"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_nav_orders"
         android:title="Orders" />
     <item
         android:id="@id/accountFragment"
-        android:icon="@android:drawable/ic_menu_manage"
+        android:icon="@drawable/ic_nav_profile"
         android:title="Account" />
 </menu>

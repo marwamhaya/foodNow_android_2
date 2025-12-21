@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:minWidth="120dp"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:cardBackgroundColor="@color/uber_white"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="2dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:textAlignment="center"
+            android:textSize="15dp"
+            android:textColor="@color/uber_orange"
+            android:text=">>"
+            app:tint="@color/primary" />
+        <!-- used ic_media_play as arrow placeholder -->
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="See all"
+        android:textColor="@color/primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

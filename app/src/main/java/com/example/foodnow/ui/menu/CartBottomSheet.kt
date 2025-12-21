@@ -13,16 +13,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodnow.R
+import com.example.foodnow.FoodNowApp
 import com.example.foodnow.databinding.BottomSheetCartBinding
+import com.example.foodnow.ui.ViewModelFactory
 import com.example.foodnow.utils.CartItem
 import com.example.foodnow.utils.CartManager
+import com.example.foodnow.utils.Constants
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 
-class CartBottomSheet(private val viewModel: MenuViewModel, private val restaurantId: Long) : BottomSheetDialogFragment() {
+class CartBottomSheet(
+    private val externalViewModel: MenuViewModel? = null, 
+    private val externalRestaurantId: Long? = null
+) : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetCartBinding
     private lateinit var adapter: CartAdapter
+    private lateinit var viewModel: MenuViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = BottomSheetCartBinding.inflate(inflater, container, false)
@@ -32,9 +40,24 @@ class CartBottomSheet(private val viewModel: MenuViewModel, private val restaura
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = CartAdapter { idx, newQty ->
-            CartManager.updateQuantity(idx, newQty)
+        // Use external ViewModel if provided, otherwise create our own scoped to Activity
+        // This ensures the ViewModel (and its coroutines) survive if CartBottomSheet is dismissed (e.g. when opening PaymentBottomSheet)
+        viewModel = externalViewModel ?: run {
+            val app = requireActivity().application as FoodNowApp
+            ViewModelProvider(requireActivity(), ViewModelFactory(app.repository))[MenuViewModel::class.java]
         }
+        
+        // Get restaurant ID from external source or from CartManager
+        val restaurantId = externalRestaurantId ?: CartManager.getCurrentRestaurantId()
+
+        adapter = CartAdapter(
+            onQuantityChange = { idx, newQty ->
+                CartManager.updateQuantity(idx, newQty)
+            },
+            onRemoveClick = { idx ->
+                CartManager.removeItem(idx)
+            }
+        )
         
         binding.rvCartItems.layoutManager = LinearLayoutManager(context)
         binding.rvCartItems.adapter = adapter
@@ -50,25 +73,34 @@ class CartBottomSheet(private val viewModel: MenuViewModel, private val restaura
         }
 
         binding.btnPlaceOrder.setOnClickListener {
-            // viewModel.placeOrder(restaurantId) // Old logic
-            // Open Payment Sheet
-            val paymentSheet = PaymentBottomSheet(viewModel, restaurantId)
-            paymentSheet.show(parentFragmentManager, "PaymentBottomSheet")
-            // Optional: Dismiss cart sheet if you want a clean transition, 
-            // but keeping it might be okay if Payment is just a confirm. 
-            // For now, let's keep it open or dismiss? Dismissing is safer UI-wise.
+            if (restaurantId != null) {
+                // Open Payment Sheet with the ViewModel (always available now)
+                val paymentSheet = PaymentBottomSheet(viewModel, restaurantId)
+                paymentSheet.show(parentFragmentManager, "PaymentBottomSheet")
+                dismiss()
+            } else {
+                // Cart is empty or no restaurant selected
+                Toast.makeText(context, "Your cart is empty.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnClose.setOnClickListener {
             dismiss()
         }
     }
 
     private fun updateTotal(items: List<CartItem>) {
         val total = CartManager.getTotal()
-        binding.tvTotal.text = "Total: ${String.format("%.2f", total)} DH"
-        binding.btnPlaceOrder.text = "Place Order - ${String.format("%.2f", total)} DH"
+        binding.tvTotal.text = "${String.format("%.2f", total)} DH"
+        // Button text is just "Checkout", no dynamic total anymore in button
+        binding.btnPlaceOrder.text = "Checkout"
     }
 }
 
-class CartAdapter(private val onQuantityChange: (Int, Int) -> Unit) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
+class CartAdapter(
+    private val onQuantityChange: (Int, Int) -> Unit,
+    private val onRemoveClick: (Int) -> Unit
+) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
     private var items = listOf<CartItem>()
 
     fun submitList(newItems: List<CartItem>) {
@@ -83,11 +115,24 @@ class CartAdapter(private val onQuantityChange: (Int, Int) -> Unit) : RecyclerVi
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
         val item = items[position]
+        val context = holder.itemView.context
         
         holder.tvName.text = item.menuItem.name
-        holder.tvQuantity.text = item.quantity.toString()
+        holder.tvQuantity.text = String.format("%02d", item.quantity) // Format 01, 02
         holder.tvPrice.text = "${String.format("%.2f", item.totalPrice)} DH"
         
+        // Load Image
+        val imageUrl = item.menuItem.imageUrl
+        if (!imageUrl.isNullOrEmpty()) {
+             val fullUrl = Constants.getFullImageUrl(imageUrl)
+             Glide.with(context)
+                 .load(fullUrl)
+                 .centerCrop()
+                 .into(holder.ivImage)
+        } else {
+             holder.ivImage.setImageResource(R.drawable.placeholder_food)
+        }
+
         // Display selected options/supplements
         if (item.selectedOptionIds.isNotEmpty()) {
             val optionNames = mutableListOf<String>()
@@ -100,7 +145,7 @@ class CartAdapter(private val onQuantityChange: (Int, Int) -> Unit) : RecyclerVi
             }
             if (optionNames.isNotEmpty()) {
                 holder.tvOptions.visibility = View.VISIBLE
-                holder.tvOptions.text = "• ${optionNames.joinToString(", ")}"
+                holder.tvOptions.text = optionNames.joinToString(", ")
             } else {
                 holder.tvOptions.visibility = View.GONE
             }
@@ -117,6 +162,11 @@ class CartAdapter(private val onQuantityChange: (Int, Int) -> Unit) : RecyclerVi
         holder.btnIncrease.setOnClickListener {
             onQuantityChange(position, item.quantity + 1)
         }
+        
+        // Remove button is hidden in layout but can keep listener if visible
+        holder.btnRemove.setOnClickListener {
+             onRemoveClick(position)
+        }
     }
 
     override fun getItemCount() = items.size
@@ -126,8 +176,9 @@ class CartAdapter(private val onQuantityChange: (Int, Int) -> Unit) : RecyclerVi
         val tvOptions: TextView = itemView.findViewById(R.id.tvCartItemOptions)
         val tvPrice: TextView = itemView.findViewById(R.id.tvCartItemPrice)
         val tvQuantity: TextView = itemView.findViewById(R.id.tvCartItemQuantity)
-        val btnDecrease: TextView = itemView.findViewById(R.id.btnDecreaseQty)
-        val btnIncrease: TextView = itemView.findViewById(R.id.btnIncreaseQty)
+        val btnDecrease: View = itemView.findViewById(R.id.btnDecreaseQty) // View or ImageButton
+        val btnIncrease: View = itemView.findViewById(R.id.btnIncreaseQty)
+        val btnRemove: View = itemView.findViewById(R.id.btnRemove)
+        val ivImage: android.widget.ImageView = itemView.findViewById(R.id.ivCartItemImage)
     }
 }
-

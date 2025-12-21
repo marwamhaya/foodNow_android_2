@@ -50,12 +50,38 @@
     </fragment>
 
     <fragment
+        android:id="@+id/popularItemsFragment"
+        android:name="com.example.foodnow.ui.home.PopularItemsFragment"
+        android:label="Popular Items"
+        tools:layout="@layout/fragment_popular_items">
+        <action
+            android:id="@+id/action_popular_items_to_menu"
+            app:destination="@id/menuFragment" />
+    </fragment>
+    
+    <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.foodnow.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_home_to_menu"
+            app:destination="@id/menuFragment" />
+        <action
+            android:id="@+id/action_home_to_all_restaurants"
+            app:destination="@id/allRestaurantsFragment"/>
+        <action
+            android:id="@+id/action_home_to_popular_items"
+            app:destination="@id/popularItemsFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/allRestaurantsFragment"
+        android:name="com.example.foodnow.ui.home.AllRestaurantsFragment"
+        android:label="All Restaurants"
+        tools:layout="@layout/fragment_all_restaurants">
+        <action
+            android:id="@+id/action_all_to_menu"
             app:destination="@id/menuFragment" />
     </fragment>
 

@@ -23,7 +23,7 @@
         app:tabSelectedTextColor="@color/primary"
         app:tabIndicatorColor="@color/primary"
         app:tabTextColor="@color/text_secondary"
-        app:tabMode="fixed"
+        app:tabMode="scrollable"
         android:elevation="2dp">
 
         <com.google.android.material.tabs.TabItem
@@ -45,6 +45,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ready" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delivered" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelled" />
     </com.google.android.material.tabs.TabLayout>
 
     <FrameLayout
