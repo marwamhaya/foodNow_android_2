@@ -51,10 +51,6 @@ class RatingBottomSheetFragment : BottomSheetDialogFragment() {
                 .into(binding.ivRestaurantImage)
         }
 
-        // Photo upload button (placeholder functionality)
-        binding.btnAddPhoto.setOnClickListener {
-            Toast.makeText(context, "Photo upload coming soon", Toast.LENGTH_SHORT).show()
-        }
 
         binding.btnSubmitRating.setOnClickListener {
             val rating = binding.ratingBar.rating.toInt()

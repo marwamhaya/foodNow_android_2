@@ -46,7 +46,7 @@ class OrderDetailsFragment : Fragment(R.layout.fragment_order_details) {
         viewModel.orders.observe(viewLifecycleOwner) { result ->
              val order = result.getOrNull()?.find { it.id == orderId }
              if (order != null) {
-                 tvId.text = "Order #${order.id}"
+                 tvId.text = "Order ${order.id}"
                  tvDate.text = "Date: ${order.createdAt.take(16).replace("T", " ")}"
                  tvStatus.text = order.status
                  tvTotal.text = "${String.format("%.2f", order.totalAmount)} DH"

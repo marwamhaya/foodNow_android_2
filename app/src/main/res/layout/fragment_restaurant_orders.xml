@@ -57,33 +57,8 @@
             android:text="Cancelled" />
     </com.google.android.material.tabs.TabLayout>
 
-    <FrameLayout
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerOrders"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRestaurantOrders"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingVertical="8dp"
-            android:clipToPadding="false"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-        <TextView
-            android:id="@+id/tvEmptyOrders"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No orders found"
-            android:textSize="18sp"
-            android:textColor="@color/text_secondary"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-        <ProgressBar
-            android:id="@+id/progressBarOrders"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-    </FrameLayout>
+        android:layout_height="match_parent" />
 </LinearLayout>

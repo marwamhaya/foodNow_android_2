@@ -30,7 +30,7 @@ object WebSocketService {
             return
         }
 
-        // Create OkHttpClient with auth headers
+        // Interceptor : Ajoute automatiquement le header d'authentification à chaque requête WebSocket
         val client = okhttp3.OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val original = chain.request()
@@ -40,9 +40,11 @@ object WebSocketService {
                 chain.proceed(request)
             }
             .build()
-            
+        //Crée le client STOMP avec OkHttp comme transport
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_URL, null, client)
-        
+        //subscribeOn(Schedulers.io()) : Exécute sur thread background
+        //observeOn(AndroidSchedulers.mainThread()) : Reçoit les résultats sur le thread UI
+        //subscribe : Abonne à l'événement de la connexion
         stompClient?.lifecycle()
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
@@ -56,16 +58,18 @@ object WebSocketService {
             }, { error ->
                 Log.e(TAG, "Lifecycle subscription error", error)
             })?.let { compositeDisposable.add(it) }
-
+            //Lance la connexion WebSocket
         stompClient?.connect()
     }
-
+    //Ferme la connexion WebSocket
     fun disconnect() {
         try {
+            //Ferme la connexion WebSocket
             stompClient?.disconnect()
         } catch (e: Exception) {
             Log.e(TAG, "Error during disconnect", e)
         }
+        //Supprime les abonnements
         compositeDisposable.clear()
         stompClient = null
     }
@@ -73,9 +77,11 @@ object WebSocketService {
     @SuppressLint("CheckResult")
     fun sendLocation(orderId: Long, latitude: Double, longitude: Double) {
         if (stompClient == null || !stompClient!!.isConnected) return
-
+        //Crée un JSON avec les coordonnées
         val json = "{\"latitude\": $latitude, \"longitude\": $longitude}"
-        
+        //Envoie la localisation
+        //Exécute sur thread background
+        //Reçoit les résultats sur le thread UI
         stompClient?.send("/app/delivery/$orderId/location", json)
             ?.compose { upstream -> upstream.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()) }
             ?.subscribe(

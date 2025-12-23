@@ -35,7 +35,6 @@ class OrderDetailsBottomSheet(private val order: Order) : BottomSheetDialogFragm
         binding.btnClose.setOnClickListener { dismiss() }
 
         binding.tvOrderId.visibility = View.GONE
-        binding.tvOrderId.text = "Order #${order.id}"
         binding.tvRestaurantName.text = order.restaurantName
         binding.tvRestaurantCategory.text = "Restaurant" // Placeholder category
         binding.tvOrderDate.text = "Date: ${order.createdAt.take(10)}"
@@ -139,12 +138,13 @@ class OrderItemsAdapter(private val items: List<OrderItem>) : RecyclerView.Adapt
         }
         
         // Show supplements with prices if any
-        if (!item.selectedOptions.isNullOrEmpty()) {
-            holder.tvItemDetails.visibility = View.VISIBLE
-            val detailsText = item.selectedOptions.joinToString(", ") { 
-                "${it.name} (+${String.format("%.2f", it.price)} DH)" 
+        val options = item.selectedOptions
+        if (!options.isNullOrEmpty()) {
+            val detailsText = options.joinToString("\n") { 
+                "• ${it.name} (+${String.format("%.2f", it.price)} DH)" 
             }
-            holder.tvItemDetails.text = "• $detailsText"
+            holder.tvItemDetails.text = detailsText
+            holder.tvItemDetails.visibility = View.VISIBLE
         } else {
             holder.tvItemDetails.visibility = View.GONE
         }

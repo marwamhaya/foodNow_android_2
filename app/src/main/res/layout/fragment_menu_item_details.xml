@@ -46,7 +46,7 @@
                     android:id="@+id/tvAvailability"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🟢 Available"
+                    android:text="Available"
                     android:textSize="14sp"
                     android:textColor="@color/success"
                     android:background="@drawable/bg_quantity_selector"
@@ -59,8 +59,9 @@
                 android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📂 Category"
+                android:text="Category"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="8dp"/>
 
@@ -123,14 +124,40 @@
                 android:layout_marginTop="8dp"/>
 
             <!-- Edit Button -->
-            <Button
-                android:id="@+id/btnEdit"
+
+            <!-- Delete Button -->
+
+            <!-- Actions -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Edit Item"
-                android:backgroundTint="@color/primary"
-                android:textColor="@color/white"
-                android:layout_marginTop="32dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="32dp">
+
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Edit Item"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/primary"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Delete Item"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/error"
+                    android:layout_marginStart="8dp"/>
+
+            </LinearLayout>
+
 
         </LinearLayout>
     </LinearLayout>

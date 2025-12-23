@@ -1,12 +1,10 @@
 package com.example.foodnow.ui.account
 
 import android.app.AlertDialog
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -39,73 +37,33 @@ class AccountFragment : Fragment(R.layout.fragment_account) {
         viewModel.actionResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { msg ->
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                if (msg == "Account deleted") {
-                     findNavController().navigate(R.id.loginFragment)
-                }
             }.onFailure {
                 Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
         }
 
-        binding.btnChangePassword.setOnClickListener {
-            showChangePasswordDialog()
+        // My Profile button
+        binding.btnMyProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_account_to_profile_details)
         }
 
-        binding.btnDarkMode.setOnClickListener {
-             val currentMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-             if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
-                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-             } else {
-                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-             }
+        // Contact Us button
+        binding.btnContactUs.setOnClickListener {
+            val contactBottomSheet = ContactUsBottomSheet()
+            contactBottomSheet.show(parentFragmentManager, "ContactUsBottomSheet")
         }
         
+        // Logout button
         binding.btnLogout.setOnClickListener {
-            viewModel.logout()
-            findNavController().navigate(R.id.loginFragment)
-        }
-        
-        binding.tvDeleteAccount.setOnClickListener {
-             AlertDialog.Builder(context)
-                .setTitle("Delete Account")
-                .setMessage("Are you sure? This action cannot be undone.")
-                .setPositiveButton("Delete") { _, _ -> viewModel.deleteAccount() }
+            AlertDialog.Builder(context)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Logout") { _, _ ->
+                    viewModel.logout()
+                    findNavController().navigate(R.id.loginFragment)
+                }
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-    }
-
-    private fun showChangePasswordDialog() {
-        val layout = android.widget.LinearLayout(context).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            setPadding(50, 40, 50, 10)
-        }
-
-        val etCurrent = EditText(context).apply {
-            hint = "Current Password"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-        val etNew = EditText(context).apply {
-            hint = "New Password"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-
-        layout.addView(etCurrent)
-        layout.addView(etNew)
-
-        AlertDialog.Builder(context)
-            .setTitle("Change Password")
-            .setView(layout)
-            .setPositiveButton("Update") { _, _ ->
-                val current = etCurrent.text.toString()
-                val newPass = etNew.text.toString()
-                if (current.isNotEmpty() && newPass.isNotEmpty()) {
-                    viewModel.changePassword(current, newPass)
-                } else {
-                    Toast.makeText(context, "Both fields required", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 }

@@ -100,35 +100,22 @@ class LocationService : Service() {
     }
 
     private fun sendLocationUpdate(location: Location) {
-        // Validate Token and Role
+        // Validate Token
         val tokenManager = com.example.foodnow.data.TokenManager(this)
         val token = tokenManager.getToken()
-        // Assuming ROLE_LIVREUR is stored as "LIVREUR" or "ROLE_LIVREUR". Checking contains "LIVREUR" to be safe.
-        // Actually TokenManager.kt doesn't show role saving logic, checking what's available.
-        // But simply checking if token exists is a good start. 
+
         if (token.isNullOrEmpty()) {
             Log.e("LocationService", "No auth token found. Stopping service.")
             stopSelf()
             return
         }
 
-        scope.launch {
-            try {
-                Log.d("LocationService", "Location update: ${location.latitude}, ${location.longitude}")
-                
-                // Send to Backend (which broadcasts via WebSocket) if order is active
-                activeOrderId?.let { orderId ->
-                    if (orderId != -1L) {
-                        val repository = (application as FoodNowApp).repository
-                        repository.saveDriverLocation(orderId, com.example.foodnow.data.LocationUpdateDto(location.latitude, location.longitude))
-                    }
-                }
-
-                // Also update via REST API for backup/logging
-                val repository = (application as FoodNowApp).repository
-                repository.updateLocation(location.latitude, location.longitude)
-            } catch (e: Exception) {
-                Log.e("LocationService", "Error sending location update", e)
+        // Send to Backend via WebSocket for real-time broadcasting
+        activeOrderId?.let { orderId ->
+            if (orderId != -1L) {
+               // Use WebSocketService which is already connected in onStartCommand
+               WebSocketService.sendLocation(orderId, location.latitude, location.longitude)
+               Log.d("LocationService", "Sent WebSocket update for Order $orderId: ${location.latitude}, ${location.longitude}")
             }
         }
     }

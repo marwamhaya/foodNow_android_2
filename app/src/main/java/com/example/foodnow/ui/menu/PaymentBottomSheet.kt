@@ -124,8 +124,8 @@ class PaymentBottomSheet(private val viewModel: MenuViewModel, private val resta
         
         lifecycleScope.launch {
              // Default to Casablaca if location fails completely, but try hard to get real loc
-             var lat = 33.57311
-             var lng = -7.58984
+             var lat = 33.2
+             var lng = 8.4
              
              try {
                 // Try to get fresh location with timeout (increased to 15s)

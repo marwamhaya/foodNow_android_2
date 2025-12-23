@@ -119,5 +119,15 @@
         android:id="@+id/accountFragment"
         android:name="com.example.foodnow.ui.account.AccountFragment"
         android:label="Account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account">
+        <action
+            android:id="@+id/action_account_to_profile_details"
+            app:destination="@id/profileDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileDetailsFragment"
+        android:name="com.example.foodnow.ui.account.ProfileDetailsFragment"
+        android:label="Profile Details"
+        tools:layout="@layout/fragment_profile_details" />
 </navigation>

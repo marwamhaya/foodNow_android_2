@@ -76,29 +76,5 @@ class ChangePasswordFragment : Fragment(R.layout.fragment_change_password) {
             }
         }
         
-        btnSave.setOnClickListener {
-            val current = etCurrent.text.toString()
-            val newPass = etNew.text.toString()
-            val confirm = etConfirm.text.toString()
-
-            if (current.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
-                Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (newPass != confirm) {
-                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (newPass.length < 6) {
-                Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            viewModel.changePassword(current, newPass)
-            progressBar.visibility = View.VISIBLE
-            btnSave.isEnabled = false
-        }
     }
 }

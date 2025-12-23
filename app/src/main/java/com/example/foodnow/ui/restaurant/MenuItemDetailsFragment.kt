@@ -43,6 +43,7 @@ class MenuItemDetailsFragment : Fragment(R.layout.fragment_menu_item_details) {
         val rvOptionGroups = view.findViewById<RecyclerView>(R.id.rvOptionGroups)
         val tvNoSupplements = view.findViewById<TextView>(R.id.tvNoSupplements)
         val btnEdit = view.findViewById<Button>(R.id.btnEdit)
+        val btnDelete = view.findViewById<Button>(R.id.btnDelete)
 
         rvOptionGroups.layoutManager = LinearLayoutManager(context)
 
@@ -64,12 +65,12 @@ class MenuItemDetailsFragment : Fragment(R.layout.fragment_menu_item_details) {
                 tvAvailability.text = "🟢 Available"
                 tvAvailability.setTextColor(ContextCompat.getColor(requireContext(), R.color.success))
             } else {
-                tvAvailability.text = "🔴 Not Available"
+                tvAvailability.text = "Not Available"
                 tvAvailability.setTextColor(ContextCompat.getColor(requireContext(), R.color.error))
             }
 
             // Category
-            tvCategory.text = "📂 ${item.category ?: "Uncategorized"}"
+            tvCategory.text = "${item.category ?: "Uncategorized"}"
 
             // Price
             tvPrice.text = "${item.price} DH"
@@ -98,5 +99,36 @@ class MenuItemDetailsFragment : Fragment(R.layout.fragment_menu_item_details) {
             val bundle = Bundle().apply { putLong("menuItemId", menuItemId) }
             findNavController().navigate(R.id.action_details_to_edit, bundle)
         }
+
+        // Delete button with confirmation
+        btnDelete.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Delete Menu Item")
+            .setMessage("Are you sure you want to delete this menu item? This action cannot be undone.")
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setPositiveButton("Delete") { _, _ ->
+                deleteMenuItem()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteMenuItem() {
+        viewModel.deleteMenuItem(menuItemId)
+        
+        // Show success message
+        android.widget.Toast.makeText(
+            requireContext(),
+            "Menu item deleted successfully",
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+        
+        // Navigate back to home
+        findNavController().popBackStack(R.id.restaurantHomeFragment, false)
     }
 }

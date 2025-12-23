@@ -127,7 +127,8 @@ class AddEditMenuItemFragment : Fragment(R.layout.fragment_add_edit_menu_item) {
             result.onSuccess { success ->
                 if (success) {
                     Toast.makeText(context, "Saved successfully", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
+                    // Stay on the form for further updates
+                    // findNavController().popBackStack(R.id.restaurantHomeFragment, false)
                 }
             }.onFailure { e ->
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()

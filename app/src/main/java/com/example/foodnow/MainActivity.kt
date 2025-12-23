@@ -52,7 +52,9 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.homeFragment, R.id.ordersFragment, R.id.accountFragment, 
-                R.id.menuFragment, R.id.allRestaurantsFragment, R.id.popularItemsFragment -> {
+                R.id.menuFragment, R.id.allRestaurantsFragment, R.id.popularItemsFragment,
+                R.id.restaurantDashboardFragment, R.id.restaurantOrdersFragment, 
+                R.id.restaurantHomeFragment, R.id.restaurantAccountFragment -> {
                     bottomNav.visibility = View.VISIBLE
                 }
                 else -> {

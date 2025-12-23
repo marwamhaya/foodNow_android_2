@@ -62,18 +62,12 @@ class RestaurantProfileFragment : Fragment(R.layout.fragment_restaurant_profile)
         btnUpload = view.findViewById(R.id.btnUploadImage)
         progressBar = view.findViewById(R.id.progressBar)
         progressBarImage = view.findViewById(R.id.progressBarImage)
-        val btnChangePassword = view.findViewById<Button>(R.id.btnChangePassword)
 
         setupObservers()
 
         btnSave.setOnClickListener { saveProfile() }
         btnUpload.setOnClickListener { 
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
-        btnChangePassword.setOnClickListener {
-            // Navigate to Change Password Fragment (To be implemented)
-            // findNavController().navigate(R.id.action_profile_to_changePassword)
-            Toast.makeText(context, "Change Password clicked", Toast.LENGTH_SHORT).show()
         }
 
         // Initial Load
@@ -104,16 +98,19 @@ class RestaurantProfileFragment : Fragment(R.layout.fragment_restaurant_profile)
             }
         }
 
+        // Use a single-time observer to prevent multiple triggers
         viewModel.updateStatus.observe(viewLifecycleOwner) { result ->
             progressBar.visibility = View.GONE
             btnSave.isEnabled = true
-            result.onSuccess { 
-                if (it) {
+            
+            result.onSuccess { success ->
+                if (success) {
                     Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
-                    viewModel.getMyRestaurant() // Refresh to sync
+                    // Navigate back to restaurant home page
+                    findNavController().popBackStack(R.id.restaurantHomeFragment, false)
                 }
-            }.onFailure {
-                Toast.makeText(context, "Update failed: ${it.message}", Toast.LENGTH_SHORT).show()
+            }.onFailure { error ->
+                Toast.makeText(context, "Update failed: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
         

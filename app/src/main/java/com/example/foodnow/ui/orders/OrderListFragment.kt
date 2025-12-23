@@ -52,7 +52,12 @@ class OrderListFragment : Fragment(R.layout.fragment_order_list) {
                 detailsSheet.show(parentFragmentManager, "OrderDetailsBottomSheet")
             },
             onRateClick = { order ->
-                 val ratingSheet = RatingBottomSheetFragment.newInstance(order.id, order.restaurantName)
+                 val ratingSheet = RatingBottomSheetFragment.newInstance(
+                     order.id, 
+                     order.restaurantName,
+                     order.restaurantAddress,
+                     order.restaurantImageUrl
+                 )
                  ratingSheet.show(parentFragmentManager, "RatingBottomSheetFragment")
             }
         )

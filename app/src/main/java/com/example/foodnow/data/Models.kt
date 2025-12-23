@@ -138,6 +138,8 @@ data class Order(
     val status: String,
     val totalAmount: BigDecimal,
     val deliveryAddress: String?,
+    val driverName: String?,
+    val driverPhone: String?,
     val createdAt: String,
     @SerializedName("orderItems")
     val items: List<OrderItem> = emptyList()
@@ -156,7 +158,9 @@ data class DeliveryResponse(
     val deliveryTime: String?,
     val createdAt: String,
     val rating: Int?,
-    val ratingComment: String?
+    val ratingComment: String?,
+    val driverName: String?,
+    val driverPhone: String?
 )
 
 data class LivreurResponse(

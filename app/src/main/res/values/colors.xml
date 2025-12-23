@@ -36,4 +36,5 @@
     <color name="uber_text_secondary">@color/text_secondary</color>
     <color name="uber_divider">@color/divider</color>
     <color name="uber_orange">@color/primary</color>
+    <color name="uber_light_gray">#F5F5F5</color>
 </resources>

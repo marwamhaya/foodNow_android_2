@@ -6,6 +6,22 @@
     app:startDestination="@id/restaurantDashboardFragment">
 
     <fragment
+        android:id="@+id/restaurantHomeFragment"
+        android:name="com.example.foodnow.ui.restaurant.RestaurantHomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_restaurant_home">
+        <action
+            android:id="@+id/action_restaurantHomeFragment_to_addEditMenuItemFragment"
+            app:destination="@id/addEditMenuItemFragment" />
+        <action
+            android:id="@+id/action_restaurantHomeFragment_to_menuItemDetailsFragment"
+            app:destination="@id/menuItemDetailsFragment" />
+        <action
+            android:id="@+id/action_restaurantHomeFragment_to_editRestaurantInfoFragment"
+            app:destination="@id/restaurantProfileFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/restaurantDashboardFragment"
         android:name="com.example.foodnow.ui.restaurant.RestaurantDashboardFragment"
         android:label="Dashboard"
@@ -126,8 +142,21 @@
         android:name="com.example.foodnow.ui.restaurant.RestaurantRatingsFragment"
         android:label="My Ratings"
         tools:layout="@layout/fragment_restaurant_ratings" />
+
+    <fragment
+        android:id="@+id/restaurantAccountFragment"
+        android:name="com.example.foodnow.ui.restaurant.RestaurantAccountFragment"
+        android:label="Account"
+        tools:layout="@layout/fragment_account">
+        <action
+            android:id="@+id/action_restaurantAccountFragment_to_ownerProfile"
+            app:destination="@id/restaurantOwnerProfileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/restaurantOwnerProfileFragment"
+        android:name="com.example.foodnow.ui.restaurant.RestaurantOwnerProfileFragment"
+        android:label="My Profile"
+        tools:layout="@layout/fragment_profile_details" />
         
-    <!-- Action from Dashboard to Profile -->
-    <!-- Ideally dashboard has a menu or button to go to profile -->
-    <!-- Adding action to dashboard fragment -->
 </navigation>

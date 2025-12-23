@@ -9,7 +9,11 @@
         android:icon="@drawable/ic_receipt_long_24"
         android:title="Orders" />
     <item
-        android:id="@+id/restaurantMenuFragment"
+        android:id="@+id/restaurantHomeFragment"
         android:icon="@drawable/ic_restaurant_24"
-        android:title="Menu" />
+        android:title="Restaurant" />
+    <item
+        android:id="@+id/restaurantAccountFragment"
+        android:icon="@drawable/ic_nav_profile"
+        android:title="Account" />
 </menu>

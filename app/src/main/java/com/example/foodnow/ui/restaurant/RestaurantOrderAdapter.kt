@@ -25,8 +25,8 @@ class RestaurantOrderAdapter(
         val tvPrice: TextView = itemView.findViewById(R.id.tvOrderPrice)
         val tvClientName: TextView = itemView.findViewById(R.id.tvClientName)
         val tvOrderDate: TextView = itemView.findViewById(R.id.tvOrderDate)
-        val btnAction1: Button = itemView.findViewById(R.id.btnAction1)
-        val btnAction2: Button = itemView.findViewById(R.id.btnAction2)
+        val btnAccept: Button = itemView.findViewById(R.id.btnAccept)
+        val btnReject: Button = itemView.findViewById(R.id.btnReject)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
@@ -38,8 +38,8 @@ class RestaurantOrderAdapter(
         val order = orders[position]
         holder.tvId.text = "Order #${order.id}"
         holder.tvStatus.text = order.status
-        holder.tvPrice.text = "Total: ${String.format("%.2f", order.totalAmount)} DH"
-        holder.tvClientName.text = "Client: ${order.clientName ?: "Unknown"}"
+        holder.tvPrice.text = order.totalAmount.toString() + " DH"
+        holder.tvClientName.text = order.clientName ?: "Unknown"
         
         // Format date
         try {
@@ -76,47 +76,47 @@ class RestaurantOrderAdapter(
         holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, statusColor))
 
         // Reset state for recycling
-        holder.btnAction1.isEnabled = true
-        holder.btnAction1.visibility = View.VISIBLE
-        holder.btnAction2.isEnabled = true 
-        holder.btnAction2.visibility = View.VISIBLE
+        holder.btnAccept.isEnabled = true
+        holder.btnAccept.visibility = View.VISIBLE
+        holder.btnReject.isEnabled = true 
+        holder.btnReject.visibility = View.VISIBLE
 
         // Configure buttons based on status
         when (order.status) {
             "PENDING" -> {
-                holder.btnAction1.text = "Accept"
-                holder.btnAction2.text = "Reject"
+                holder.btnAccept.text = "Accept"
+                holder.btnReject.text = "Reject"
             }
             "ACCEPTED" -> {
-                holder.btnAction1.text = "Prepare"
-                holder.btnAction2.visibility = View.GONE
+                holder.btnAccept.text = "Prepare"
+                holder.btnReject.visibility = View.GONE
             }
             "PREPARING" -> {
-                holder.btnAction1.text = "Ready"
-                holder.btnAction2.visibility = View.GONE
+                holder.btnAccept.text = "Ready"
+                holder.btnReject.visibility = View.GONE
             }
             "READY_FOR_PICKUP" -> {
-                holder.btnAction1.text = "Waiting Pickup"
-                holder.btnAction1.isEnabled = false
-                holder.btnAction2.visibility = View.GONE
+                holder.btnAccept.text = "Waiting Pickup"
+                holder.btnAccept.isEnabled = false
+                holder.btnReject.visibility = View.GONE
             }
             "IN_DELIVERY" -> {
-                holder.btnAction1.text = "In Delivery"
-                holder.btnAction1.isEnabled = false
-                holder.btnAction2.visibility = View.GONE
+                holder.btnAccept.text = "In Delivery"
+                holder.btnAccept.isEnabled = false
+                holder.btnReject.visibility = View.GONE
             }
             "DELIVERED", "CANCELLED", "DECLINED" -> {
-                holder.btnAction1.visibility = View.GONE
-                holder.btnAction2.visibility = View.GONE
+                holder.btnAccept.visibility = View.GONE
+                holder.btnReject.visibility = View.GONE
             }
             else -> {
-                holder.btnAction1.visibility = View.GONE
-                holder.btnAction2.visibility = View.GONE
+                holder.btnAccept.visibility = View.GONE
+                holder.btnReject.visibility = View.GONE
             }
         }
 
-        holder.btnAction1.setOnClickListener { onAction1Click(order) }
-        holder.btnAction2.setOnClickListener { onAction2Click(order) }
+        holder.btnAccept.setOnClickListener { onAction1Click(order) }
+        holder.btnReject.setOnClickListener { onAction2Click(order) }
         
         // Item click for viewing details
         holder.itemView.setOnClickListener { onItemClick(order) }

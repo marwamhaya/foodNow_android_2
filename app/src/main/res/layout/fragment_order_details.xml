@@ -12,93 +12,115 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Order Header Card -->
+        <!-- ORDER HEADER CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
             app:contentPadding="16dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvOrderId"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Order #123"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
-
-                <TextView
-                    android:id="@+id/tvOrderDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date: -"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="4dp"/>
-
-                <TextView
-                    android:id="@+id/tvClientName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Client: -"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="4dp"/>
-
-                <TextView
-                    android:id="@+id/tvClientPhone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Phone: -"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="4dp"/>
-
-                <TextView
-                    android:id="@+id/tvDeliveryAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Delivery: -"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="12dp"/>
-                
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider"
-                    android:layout_marginBottom="12dp"/>
-                
+                <!-- Order ID + Status -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvOrderId"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Status:"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_secondary"
-                        android:layout_marginEnd="8dp"/>
+                        android:layout_weight="1"
+                        android:text="Order 123"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"/>
+
                     <TextView
                         android:id="@+id/tvOrderStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PENDING"
-                        android:textSize="16sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="@color/primary"/>
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:textColor="@color/uber_orange"
+                        android:background="@drawable/bg_status_badge_orange"/>
                 </LinearLayout>
+
+                <!-- Date -->
+
+
+                <!-- Client -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="16dp">
+
+                    <!-- Nom du client -->
+                    <TextView
+                        android:id="@+id/tvClientName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="John Doe"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary"
+                        app:drawableStartCompat="@drawable/ic_nav_profile"
+                        android:drawablePadding="8dp"/>
+
+                    <!-- Date de commande -->
+                    <TextView
+                        android:id="@+id/tvOrderDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dec 19 • 14:30"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="2dp"
+                        app:drawableStartCompat="@drawable/ic_clock"
+                        android:drawablePadding="8dp"/>
+
+                    <!-- Téléphone -->
+                    <TextView
+                        android:id="@+id/tvClientPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+212 6xx xxx xxx"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="6dp"
+                        app:drawableStartCompat="@drawable/ic_phone"
+                        android:drawablePadding="8dp"/>
+
+                    <!-- Adresse -->
+                    <TextView
+                        android:id="@+id/tvDeliveryAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Delivery address"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="2dp"
+                        app:drawableStartCompat="@drawable/ic_location"
+                        android:drawablePadding="8dp"/>
+                </LinearLayout>
+
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Items List -->
+        <!-- ITEMS TITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -108,15 +130,16 @@
             android:textColor="@color/text_primary"
             android:layout_marginBottom="12dp"/>
 
+        <!-- ITEMS CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="1dp"
-            app:strokeColor="@color/divider"
             app:strokeWidth="1dp"
+            app:strokeColor="@color/divider"
             android:layout_marginBottom="24dp">
-            
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvOrderItems"
                 android:layout_width="match_parent"
@@ -124,47 +147,60 @@
                 android:nestedScrollingEnabled="false"/>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Total -->
+        <!-- TOTAL -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end"
             android:layout_marginBottom="32dp">
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Total Amount:"
+                android:layout_weight="1"
+                android:text="Total"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginEnd="12dp"/>
+                android:textColor="@color/text_secondary"/>
+
             <TextView
                 android:id="@+id/tvTotalAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0.00 DH"
-                android:textSize="24sp"
+                android:text="125.00 DH"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"/>
         </LinearLayout>
 
-        <!-- Actions -->
-        <Button
-            android:id="@+id/btnAction1"
+        <!-- ACTION BUTTONS -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Accept Order"
-            android:backgroundTint="@color/primary"
-            android:layout_marginBottom="12dp"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
 
-        <Button
-            android:id="@+id/btnAction2"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Reject Order"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:textColor="@color/error"
-            app:strokeColor="@color/error"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAction2"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Reject"
+                android:textSize="12dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:textColor="@color/error"
+                app:strokeColor="@color/error"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAction1"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Accept"
+                android:textSize="12dp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="@color/uber_orange"
+                app:cornerRadius="22dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

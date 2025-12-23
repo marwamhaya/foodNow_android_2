@@ -69,9 +69,8 @@
         android:textColor="@color/text_secondary"
         android:layout_marginStart="12dp"
         android:layout_marginTop="2dp"
-        android:maxLines="2"
         android:ellipsize="end"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toEndOf="@id/cardItemImage"
         app:layout_constraintTop_toBottomOf="@id/tvItemName"
         app:layout_constraintEnd_toStartOf="@id/tvItemPrice"/>
